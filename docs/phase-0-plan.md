@@ -1,6 +1,9 @@
 # Phase 0 — Plan
 
-Status: **complete, waiting for your approval.** No application code was written.
+Status: **approved on 2026-10-27.** The founder accepted every recommendation:
+AWS São Paulo as the target cloud (Q1), ADR-0001/0002 (Q2), mandatory TOTP MFA (Q3), the
+proposed roles with advogados approving on any processo in the firm (Q4), fictional seed
+data (Q5), and in-house authentication (Q6). Q7–Q14 are still open.
 
 ## What Phase 0 produced
 
@@ -138,7 +141,7 @@ chat or commit them; we'll use `.env` files and the cloud's secret manager.
 | Item | Detail |
 |---|---|
 | Monorepo scaffolding | `backend/` (FastAPI, uv, ruff, mypy, pytest), `frontend/` (Next.js, pnpm, ESLint), `README.md`, `.env.example` |
-| Docker Compose | Postgres + pgvector, MinIO (local S3), api, worker, web |
+| Docker Compose | Postgres + pgvector, local S3 storage, api, worker, web |
 | Database | Alembic migrations; owner role vs app role (no `BYPASSRLS`); tables `tenants`, `users`, `memberships`, `mfa_factors`, `sessions`, `audit_log`, `jobs`, plus a minimal `document_chunks` table with a vector column so isolation can be tested |
 | Auth | Email + password (Argon2id), mandatory TOTP MFA, recovery codes, server-side sessions, roles, login rate limiting |
 | Tenancy | Tenant context per request and per job (`SET LOCAL`), RLS policies, signed URLs scoped to the tenant |

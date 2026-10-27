@@ -10,7 +10,7 @@ not create empty scaffolding ahead of time.
 ├── CLAUDE_CODE_PROMPT.md         # founder's product brief
 ├── README.md                     # how to run locally (Phase 1)
 ├── .env.example                  # every env var, no real values (Phase 1)
-├── docker-compose.yml            # postgres+pgvector, minio, api, worker, web (Phase 1)
+├── docker-compose.yml            # postgres+pgvector, seaweedfs (local S3), api, worker, web
 ├── .github/workflows/ci.yml      # lint, typecheck, tests, dependency scan (Phase 1)
 │
 ├── backend/                      # Python 3.12, FastAPI, managed with uv (Phase 1)
@@ -19,7 +19,11 @@ not create empty scaffolding ahead of time.
 │   ├── src/legalos/
 │   │   ├── main.py               # FastAPI app entrypoint
 │   │   ├── worker.py             # background worker entrypoint
-│   │   ├── core/                 # config, db session + tenant context, security, audit
+│   │   ├── config.py             # settings from LEGALOS_* environment variables
+│   │   ├── dbadmin.py            # one-time DB bootstrap: owner role, app role, database
+│   │   ├── seed.py               # fictional firms and users (dev only)
+│   │   ├── core/                 # db session + tenant context, crypto, logging, middleware
+│   │   ├── audit/                # append-only audit log
 │   │   ├── auth/                 # login, MFA, sessions, roles
 │   │   ├── tenancy/              # firms, memberships, seed data
 │   │   ├── storage/              # object storage, signed URLs
@@ -48,7 +52,9 @@ not create empty scaffolding ahead of time.
 │   ├── run.py                    # citation accuracy, recall, hallucinated-citation rate
 │   └── reports/
 │
-├── infra/                        # IaC for the Brazilian region (Phase 6)
+├── infra/
+│   ├── local/                    # local-only config (SeaweedFS S3 credentials for dev)
+│   └── ...                       # IaC for the Brazilian region (Phase 6)
 │
 └── docs/
     ├── architecture.md

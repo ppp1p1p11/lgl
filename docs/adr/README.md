@@ -33,7 +33,7 @@ Briefly, and why not.
 
 | ADR | Title | Status |
 |---|---|---|
-| [0001](0001-stack-and-monorepo.md) | Stack and monorepo layout | Proposed |
-| [0002](0002-tenant-isolation-with-rls.md) | Tenant isolation with Postgres Row-Level Security | Proposed |
-| [0003](0003-authentication-in-house.md) | Authentication and MFA built into the backend | Proposed |
-| [0004](0004-postgres-job-queue.md) | Postgres-backed job queue for the MVP | Proposed |
+| [0001](0001-stack-and-monorepo.md) | Stack and monorepo layout | Accepted |
+| [0002](0002-tenant-isolation-with-rls.md) | Tenant isolation with Postgres Row-Level Security | Accepted |
+| [0003](0003-authentication-in-house.md) | Authentication and MFA built into the backend | Accepted |
+| [0004](0004-postgres-job-queue.md) | Postgres-backed job queue for the MVP | Accepted |

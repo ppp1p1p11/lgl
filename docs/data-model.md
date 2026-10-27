@@ -9,7 +9,8 @@ Tables are introduced phase by phase; the "Phase" column says when.
 
 ## 1. Conventions
 
-- Primary keys: UUID v7 (sortable by time).
+- Primary keys: random UUIDs (v4). Time-sortable UUID v7 can replace them later without
+  schema changes if index locality ever matters.
 - Every firm-scoped table: `tenant_id uuid not null` + RLS policy
   `tenant_id = current_setting('app.tenant_id')::uuid`.
 - Timestamps: `created_at`, `updated_at` (timestamptz, UTC; displayed in

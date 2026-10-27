@@ -1,6 +1,6 @@
 # ADR-0003: Authentication and MFA built into the backend
 
-- Status: Proposed — **needs founder decision** (see question Q6 in
+- Status: Accepted (founder approved the recommendation, 2026-10-27; was Q6 in
   `docs/phase-0-plan.md`)
 - Date: 2026-10-27
 
@@ -10,7 +10,7 @@ advogado, estagiário, administrativo). Identity data is personal data and
 should stay in Brazil. Many hosted auth services store user data in the US or
 EU only.
 
-## Decision (proposed)
+## Decision
 Implement authentication inside the backend using well-established
 libraries, not hand-written cryptography:
 - Passwords hashed with Argon2id.

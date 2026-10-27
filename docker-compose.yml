@@ -1,0 +1,65 @@
+# Local development stack. Start everything with:  docker compose up --build
+# Then seed fictional firms with:                  docker compose run --rm api python -m legalos.seed
+# Web app: http://localhost:3000   API docs: http://localhost:8000/api/docs
+
+name: legalos
+
+x-backend: &backend
+  build: ./backend
+  env_file: .env
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.1-pg16
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?copy .env.example to .env first}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: [db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      retries: 30
+
+  storage:
+    image: chrislusf/seaweedfs:4.00
+    command: server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+    ports: ["127.0.0.1:8333:8333"]
+    volumes:
+      - storage-data:/data
+      - ./infra/local/seaweedfs-s3.json:/etc/seaweedfs/s3.json:ro
+
+  # One-shot: create DB roles, run migrations, create the storage bucket.
+  setup:
+    <<: *backend
+    command: >
+      sh -c "python -m legalos.dbadmin
+      && alembic upgrade head
+      && python -m legalos.storage.bootstrap"
+    depends_on:
+      db: { condition: service_healthy }
+      storage: { condition: service_started }
+    restart: "no"
+
+  api:
+    <<: *backend
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      setup: { condition: service_completed_successfully }
+
+  worker:
+    <<: *backend
+    command: python -m legalos.worker
+    depends_on:
+      setup: { condition: service_completed_successfully }
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        API_INTERNAL_URL: http://api:8000
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on: [api]
+
+volumes:
+  db-data:
+  storage-data:

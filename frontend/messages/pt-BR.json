@@ -1,0 +1,58 @@
+{
+  "app": {
+    "name": "LegalOS Brasil",
+    "tagline": "Gestão de processos com IA revisada por advogados"
+  },
+  "login": {
+    "title": "Entrar",
+    "email": "E-mail",
+    "password": "Senha",
+    "submit": "Entrar",
+    "submitting": "Entrando…"
+  },
+  "mfa": {
+    "setupTitle": "Configure a verificação em duas etapas",
+    "setupIntro": "Por segurança, todo acesso exige um código de um aplicativo autenticador (por exemplo, Google Authenticator, Microsoft Authenticator ou 1Password).",
+    "setupScan": "1. Escaneie o QR code com o aplicativo autenticador.",
+    "setupManual": "Ou digite esta chave manualmente:",
+    "setupEnterCode": "2. Digite o código de 6 dígitos exibido no aplicativo.",
+    "verifyTitle": "Verificação em duas etapas",
+    "verifyIntro": "Digite o código de 6 dígitos do seu aplicativo autenticador.",
+    "code": "Código",
+    "useRecovery": "Usar um código de recuperação",
+    "useTotp": "Usar o aplicativo autenticador",
+    "recoveryCode": "Código de recuperação",
+    "submit": "Confirmar",
+    "recoveryTitle": "Guarde seus códigos de recuperação",
+    "recoveryIntro": "Cada código pode ser usado uma única vez se você perder acesso ao aplicativo autenticador. Guarde-os em local seguro: eles não serão exibidos novamente.",
+    "recoveryDone": "Já guardei os códigos"
+  },
+  "shell": {
+    "firm": "Escritório",
+    "logout": "Sair",
+    "processos": "Processos",
+    "noFirm": "Sua conta ainda não está vinculada a nenhum escritório. Fale com o sócio responsável."
+  },
+  "roles": {
+    "socio": "Sócio(a)",
+    "advogado": "Advogado(a)",
+    "estagiario": "Estagiário(a)",
+    "administrativo": "Administrativo"
+  },
+  "processos": {
+    "title": "Processos",
+    "emptyTitle": "Nenhum processo cadastrado ainda",
+    "emptyBody": "O cadastro de clientes e processos chega na próxima fase do produto."
+  },
+  "errors": {
+    "invalid_credentials": "E-mail ou senha incorretos.",
+    "too_many_attempts": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+    "invalid_mfa_code": "Código inválido. Confira o código no aplicativo e tente novamente.",
+    "mfa_required": "Conclua a verificação em duas etapas para continuar.",
+    "not_authenticated": "Sua sessão expirou. Entre novamente.",
+    "not_a_member": "Você não faz parte deste escritório.",
+    "forbidden": "Você não tem permissão para esta ação.",
+    "no_firm_selected": "Selecione um escritório para continuar.",
+    "unknown": "Ocorreu um erro inesperado. Tente novamente."
+  }
+}

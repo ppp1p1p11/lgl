@@ -29,10 +29,12 @@ Status key: ⬜ open · 🟨 partially checked · ✅ confirmed · ❌ rejected 
 | # | Question | Where to check | Owner | Needed by | Status |
 |---|---|---|---|---|---|
 | INF-1 | Which cloud? Confirm that the São Paulo region of the chosen provider offers: managed PostgreSQL **with the pgvector extension** (which version?), S3-compatible storage with encryption at rest, backups kept in-region, a container service, and log storage | Provider region service lists; managed Postgres "supported extensions" page | C, F decides | Phase 1 end / Phase 6 | ⬜ |
-| INF-2 | pgvector: does the version we get support filtered approximate search that still returns enough results when filtered by tenant under RLS (e.g. "iterative index scans")? | pgvector changelog / README | C | Phase 1 | ⬜ |
+| INF-2 | pgvector: does the version we get support filtered approximate search that still returns enough results when filtered by tenant under RLS (e.g. "iterative index scans")? | pgvector changelog / README | C | Phase 2 (when the ANN index is added) | 🟨 Local dev and CI use pgvector 0.8.1. Phase 1 proves *isolation* (exact search, RLS applied). *Recall* with an ANN index under RLS must be tested once the embedding model and index exist |
 | INF-3 | OCR: is a managed OCR service (e.g. AWS Textract) available in São Paulo with good Portuguese support, or do we self-host (e.g. Tesseract with the `por` model, or OCRmyPDF)? Compare accuracy on real scanned court PDFs | Provider region list + language support page; a test on 10 real anonymized PDFs | C + F supplies sample PDFs | Phase 2 | ⬜ |
 | INF-4 | Error tracking / observability: where does the vendor store data? Is a Brazil or self-hosted option available? (e.g. Sentry SaaS data regions vs self-hosted Sentry/GlitchTip) | Vendor data-residency docs | C, F decides | Phase 1 (local), Phase 6 (prod) | ⬜ |
 | INF-5 | Transactional email (invites, MFA recovery): which provider can send from Brazil, and does it store message content? | Provider docs | C | Phase 1 end | ⬜ |
+| INF-6 | Managed PostgreSQL permissions: can we (a) create a second login role that owns no tables and has no `BYPASSRLS`, (b) run `CREATE EXTENSION vector`, and (c) create `SECURITY DEFINER` functions owned by the migration role? Our isolation design (ADR-0002) depends on all three | Managed Postgres docs (e.g. RDS "master user" / `rds_superuser` privileges) | C | Phase 6 (before first cloud deploy) | ⬜ |
+| INF-7 | Client IP behind proxies: which header does the production load balancer set, so audit-log IPs are the user's and not the proxy's? (Locally they show the web container's IP) | Load balancer docs | C | Phase 6 | ⬜ |
 
 ## 3. Legal sources — terms and technical access
 

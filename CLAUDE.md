@@ -6,9 +6,11 @@ for scope and rules).
 
 ## Current status
 
-- **Phase 0 (plan) — done, awaiting founder approval.** No application code yet.
-- Next: Phase 1 (foundations). Do not start it until the founder approves the
-  Phase 0 plan and answers the blocking questions in `docs/phase-0-plan.md`.
+- Phase 0 (plan) — approved 2026-10-27.
+- **Phase 1 (foundations) — done, awaiting founder approval.** Auth + MFA, roles,
+  tenants with RLS, audit log, job queue, object storage, CI, seed data.
+- Next: Phase 2 (matters + documents). Propose its plan first; do not start before
+  approval.
 
 ## How to work in this repo
 
@@ -38,13 +40,13 @@ for scope and rules).
    the tools their workflow needs; no tool sends anything outside the system.
 7. Tenant isolation is absolute — queries, vector search, caches, logs.
 
-## Architecture (planned — see `docs/architecture.md`)
+## Architecture (see `docs/architecture.md`)
 
 - `frontend/` — Next.js + React + TypeScript, UI in pt-BR only.
 - `backend/` — one Python package (`legalos`) with two entrypoints: the FastAPI
   API and the background worker. Postgres-backed job queue.
 - PostgreSQL + pgvector, Row-Level Security on every tenant table.
-- S3-compatible object storage (MinIO locally; Brazilian region in prod).
+- S3-compatible object storage (SeaweedFS locally; Brazilian region in prod).
 - All AI calls go through `legalos.gateway` (redaction, minimization, logging,
   provider routing). No other module may call an AI provider directly.
 - Legal corpus tables are global (shared, read-only to tenants); everything
@@ -61,12 +63,41 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
 - All user-facing strings: **pt-BR**.
 - Every tenant-scoped table has a non-null `tenant_id` and an RLS policy.
   The app connects as a non-owner role so RLS cannot be bypassed.
+- Migrations are hand-written SQL in `backend/alembic/versions/` (RLS policies and
+  grants are easier to review as SQL). Each new table needs: RLS enabled, policies,
+  and explicit `GRANT`s to the app role. `tests/test_tenant_isolation.py` fails if a
+  table has no RLS.
 - Every rule in the deadline engine cites its legal article in a comment.
 - Secrets never in the repo; document every variable in `.env.example`.
 
+## Database rules that are easy to get wrong
+
+- Tenant context: `legalos.core.db.set_db_context(db, user_id=…, tenant_id=…)` inside
+  the transaction. Values come only from the authenticated session or a job row, never
+  from request input. API handlers get it via the `DbSession` + principal dependencies.
+- `INSERT … RETURNING` needs the row to pass the table's SELECT policy too. Tables where
+  the app may write rows it cannot read (e.g. `audit_log` events without a firm) set
+  `__table_args__ = {"implicit_returning": False}`.
+- Work that must persist even when the request fails (failed-login audit, throttling,
+  MFA failure counters) uses `independent_transaction()` / `record_independently()`.
+- Lookups that happen before anyone is authenticated, and queue claim/finish, go through
+  the `SECURITY DEFINER` functions in migration 0001. Do not add new ones casually:
+  each one bypasses RLS.
+- Never log document text, prompts, or identifiers. Logs are JSON, scrubbed as a safety
+  net (`legalos.core.logging`).
+
 ## Commands
 
-None yet — added in Phase 1 (Docker Compose, backend tests, frontend lint).
+| Task | Command |
+|---|---|
+| Whole stack locally | `cp .env.example .env && docker compose up --build` |
+| Seed fictional firms | `docker compose run --rm api python -m legalos.seed` |
+| Backend tests | `cd backend && uv run pytest` (needs Postgres+pgvector; `LEGALOS_TEST_ADMIN_URL`, default `postgresql://postgres:postgres@localhost:5432/postgres`) |
+| Storage integration test | set `LEGALOS_TEST_S3_ENDPOINT=http://localhost:8333` with SeaweedFS running |
+| Backend lint/format/types | `uv run ruff check . && uv run ruff format --check . && uv run mypy` |
+| New migration | add a file in `backend/alembic/versions/` (SQL via `op.execute`) |
+| Frontend | `cd frontend && pnpm lint && pnpm typecheck && pnpm test && pnpm build` |
+| After API changes | `cd backend && uv run python scripts/export_openapi.py && cd ../frontend && pnpm gen:api` (CI checks both are committed) |
 
 ## Key docs
 
@@ -74,8 +105,9 @@ None yet — added in Phase 1 (Docker Compose, backend tests, frontend lint).
 |---|---|
 | `CLAUDE_CODE_PROMPT.md` | Founder's product brief |
 | `docs/phase-0-plan.md` | Phase 0 summary, questions, accounts/keys, Phase 1 preview |
+| `docs/security/threat-model.md` | Threats, mitigations and known gaps (update every phase) |
 | `docs/architecture.md` | Architecture diagrams (Mermaid) |
 | `docs/data-model.md` | Entities, tenancy, ER diagram, glossary |
-| `docs/repo-structure.md` | Planned directory layout |
+| `docs/repo-structure.md` | Directory layout |
 | `docs/VERIFY.md` | Facts that need external confirmation before we rely on them |
 | `docs/adr/` | Architecture decision records |

@@ -1,6 +1,6 @@
 # ADR-0004: Postgres-backed job queue for the MVP
 
-- Status: Proposed
+- Status: Accepted (2026-10-27)
 - Date: 2026-10-27
 
 ## Context
@@ -16,8 +16,8 @@ Postgres-backed queue and moving to Temporal only if needed.
   worker sets the tenant context before running it.
 - Retries with backoff; a job that keeps failing is marked dead and visible
   in the admin panel (Phase 6).
-- Use a maintained library for this if it fits in Phase 1 (e.g.
-  `procrastinate`), otherwise a small in-house implementation with tests.
+- Implemented in-house (a small module with tests, `legalos.jobs`): the logic is
+  short, and a library (e.g. `procrastinate`) would add concepts we do not need yet.
 
 ## Consequences
 - No extra infrastructure (no Redis, no message broker).

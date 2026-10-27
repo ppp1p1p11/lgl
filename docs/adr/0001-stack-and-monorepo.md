@@ -1,6 +1,6 @@
 # ADR-0001: Stack and monorepo layout
 
-- Status: Proposed
+- Status: Accepted (2026-10-27)
 - Date: 2026-10-27
 
 ## Context
@@ -19,7 +19,10 @@ Accept the suggested stack, with these specifics:
   relational data, full-text search, vectors (pgvector), and the job queue.
 - The frontend calls the backend through a client generated from the
   backend's OpenAPI schema.
-- Local development: Docker Compose with Postgres+pgvector and MinIO.
+- Local development: Docker Compose with Postgres+pgvector and an S3-compatible store.
+  *Amended in Phase 1:* the local store is SeaweedFS (Apache-2.0), because MinIO's
+  community Docker images are no longer published. Production uses the cloud provider's
+  S3 service; only the endpoint and credentials differ.
 
 ## Consequences
 - Two languages (TypeScript and Python) to maintain; accepted because each is
