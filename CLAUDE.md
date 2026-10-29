@@ -7,10 +7,12 @@ for scope and rules).
 ## Current status
 
 - Phase 0 (plan) — approved 2026-10-27.
-- **Phase 1 (foundations) — done, awaiting founder approval.** Auth + MFA, roles,
-  tenants with RLS, audit log, job queue, object storage, CI, seed data.
-- Next: Phase 2 (matters + documents). Propose its plan first; do not start before
-  approval.
+- Phase 1 (foundations) — done. Auth + MFA, roles, tenants with RLS, audit log, job
+  queue, object storage, CI, seed data.
+- **Phase 2 (matters + documents) — plan proposed in `docs/phase-2-plan.md`, awaiting
+  founder approval.** Split into 2a (no AI) and 2b (AI on documents).
+- Test documents: synthetic, or public sources whose terms were checked. Never collect
+  law firms' documents. No real client data until a lawyer reviews LGPD basics.
 
 ## How to work in this repo
 
@@ -105,6 +107,7 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
 |---|---|
 | `CLAUDE_CODE_PROMPT.md` | Founder's product brief |
 | `docs/phase-0-plan.md` | Phase 0 summary, questions, accounts/keys, Phase 1 preview |
+| `docs/phase-2-plan.md` | Phase 2 scope, decisions from founder answers, risks |
 | `docs/security/threat-model.md` | Threats, mitigations and known gaps (update every phase) |
 | `docs/architecture.md` | Architecture diagrams (Mermaid) |
 | `docs/data-model.md` | Entities, tenancy, ER diagram, glossary |

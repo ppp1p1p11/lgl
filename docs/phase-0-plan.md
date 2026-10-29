@@ -3,7 +3,20 @@
 Status: **approved on 2026-10-27.** The founder accepted every recommendation:
 AWS São Paulo as the target cloud (Q1), ADR-0001/0002 (Q2), mandatory TOTP MFA (Q3), the
 proposed roles with advogados approving on any processo in the firm (Q4), fictional seed
-data (Q5), and in-house authentication (Q6). Q7–Q14 are still open.
+data (Q5), and in-house authentication (Q6).
+
+Answers received 2026-10-29 (see `docs/phase-2-plan.md` for how they shape Phase 2):
+- **Q7:** trabalhista, cível, tributário.
+- **Q8:** no pilot firms or sample PDFs yet; founder suggested searching for top firms'
+  documents. We will not collect firms' documents (confidential, personal data); Phase 2
+  uses synthetic documents plus public court decisions instead.
+- **Q9:** a Brazilian lawyer will join later. Until then, legal items stay marked
+  "not reviewed by a lawyer" and no real client data is used.
+- **Q10:** best results over cost → the most capable suitable model, with cost logged
+  and capped per firm.
+- **Q11:** TJSP first.
+
+Q12–Q14 are still open.
 
 ## What Phase 0 produced
 

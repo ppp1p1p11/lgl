@@ -18,7 +18,7 @@ Status key: ⬜ open · 🟨 partially checked · ✅ confirmed · ❌ rejected 
 
 | # | Question | Where to check | Owner | Needed by | Status |
 |---|---|---|---|---|---|
-| AI-1 | Can the model we want (e.g. a current Claude model) run with **inference inside the São Paulo region** (e.g. AWS Bedrock `sa-east-1`)? Is it in-region only, or is a "cross-region inference profile" used that may route outside Brazil? | AWS Bedrock docs: "Supported models by Region" and "Cross-region inference"; Google Vertex AI and Azure equivalents | C, then F confirms with the cloud account | Phase 2 | ⬜ |
+| AI-1 | Can the model we want (Claude Opus 5.5) run with **inference inside the São Paulo region** (e.g. AWS Bedrock `sa-east-1`)? Is it in-region only, or is a "cross-region inference profile" used that may route outside Brazil? | AWS Bedrock docs: "Supported models by Region" and "Cross-region inference"; Google Vertex AI and Azure equivalents | C, then F confirms with the cloud account | Phase 2 | 🟨 Anthropic's own API offers inference-geography options "global" and "us" only (Anthropic docs, Oct 2026), so it is **not** in-Brazil inference. Bedrock `sa-east-1` still to check |
 | AI-2 | Data-use terms: does the provider train on our inputs/outputs? What is its retention period, and is zero-data-retention available? | Anthropic commercial terms + data retention docs; AWS Bedrock data-protection page | F (contract), C (summary) | Phase 2 | ⬜ |
 | AI-3 | Which **embedding model** has strong Portuguese quality *and* can run in Brazil? Candidates: an embedding model hosted on a cloud's São Paulo region, or an open-source multilingual model (e.g. BGE-M3, multilingual-E5) self-hosted in Brazil. Check licence, dimensions, cost | Model cards and licences; cloud region model lists; our own eval in Phase 3 | C | Phase 3 (ADR) | ⬜ |
 | AI-4 | Does the re-ranking model (if hosted) run in Brazil? | Same as AI-3 | C | Phase 3 | ⬜ |
@@ -52,6 +52,8 @@ terms prohibit (brief §4).
 | SRC-5 | **TST** | Súmulas, OJs, precedentes normativos, IRR; access and terms | tst.jus.br | C | Phase 3 | ⬜ |
 | SRC-6 | **CNJ DataJud public API** | Current authentication (public API key?), rate limits, which tribunals are covered, which fields come back, update delay, terms of use for commercial products. Confirm it excludes sigilo cases and full case files | CNJ DataJud wiki / API docs | C, L for terms | Phase 5 | ⬜ |
 | SRC-7 | Copyright / reuse of **ementas and court decisions** in a paid product | Lei 9.610/1998 (art. 8, IV, on official texts) and each court's terms | L | Phase 3 | ⬜ |
+| SRC-9 | **TJSP public jurisprudence** (consulta de jurisprudência / e-SAJ): whether automated download of a small set of public decisions for testing is allowed (terms, robots.txt, rate limits), and whether there is an official open-data alternative | tjsp.jus.br; robots.txt | C | Phase 2 | ⬜ |
+| SRC-10 | Which courts hear the pilot areas in São Paulo: TJSP (civil; state/municipal tax), TRT-2 and TRT-15 (labor), TRF-3 / federal courts (federal tax). Confirms which holiday calendars Phase 5 needs beyond TJSP | Court websites; CF/88 arts. 109, 114 | C, L | Phase 5 | ⬜ |
 | SRC-8 | Doutrina: we will **not** ingest copyrighted books/articles without a licence. Confirm whether there is any source we may legally use | — | F, L | Later | ⬜ |
 
 ## 4. Deadline engine — legal rules
