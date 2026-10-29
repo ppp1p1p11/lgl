@@ -1,11 +1,12 @@
-# Data model (Phase 0 proposal)
+# Data model
 
 Plain-language summary: there are two kinds of data. **Firm data** (clients,
 processos, documents, AI outputs, deadlines) belongs to exactly one firm and is
 locked to it by the database itself. **Legal corpus** (laws, súmulas,
 decisions) is public and shared by everyone, read-only.
 
-Tables are introduced phase by phase; the "Phase" column says when.
+Tables are introduced phase by phase; the headings say when. Phases 1 and 2a are
+implemented (migrations `0001`, `0002`); later sections are still the plan.
 
 ## 1. Conventions
 
@@ -18,7 +19,10 @@ Tables are introduced phase by phase; the "Phase" column says when.
 - Soft delete only where a legal hold or audit trail requires it; real
   deletion goes through the LGPD deletion workflow (Phase 6).
 - Sensitive identifiers (CPF, CNPJ, RG) stored encrypted at the column level
-  plus a keyed hash for lookup.
+  plus a keyed hash for lookup. APIs show them masked (`***.982.247-**`) except in a
+  detail view whose read is audited.
+- Foreign keys between firm tables are **composite** (`tenant_id`, `id`), so the
+  database refuses to link rows of two different firms, even for the owner role.
 - AI outputs are **immutable versions**: edits create a new version; approvals
   point to a specific version.
 
@@ -35,24 +39,24 @@ Tables are introduced phase by phase; the "Phase" column says when.
 | `sessions` | user_id, tenant_id, expires_at, ip, user_agent | Server-side sessions |
 | `audit_log` | tenant_id, actor_user_id, action, entity_type, entity_id, at, ip, metadata | Append-only. Includes every read of sensitive documents |
 
-### Clients and matters — Phase 2
+### Clients and matters — Phase 2a (implemented)
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `clients` | tenant_id, kind (PF/PJ), name, cpf_cnpj_encrypted, contact | |
-| `matters` (processo) | tenant_id, client_id, cnj_number (NNNNNNN-DD.AAAA.J.TR.OOOO, nullable for pre-litigation), court, comarca, vara, area (trabalhista, cível, consumidor…), status, opened_at | Center of the product |
-| `matter_parties` | tenant_id, matter_id, name, role (autor, réu, parte contrária, terceiro…), represented_by | |
-| `matter_members` | tenant_id, matter_id, user_id, responsibility | Who works on it |
-| `matter_events` (timeline) | tenant_id, matter_id, kind (movimentação, intimação, publicação, upload, AI output, approval), occurred_at, source (manual / datajud / document), payload | |
+| `clients` | tenant_id, kind (PF/PJ), name, document_number_encrypted + document_number_hash (CPF or CNPJ, incl. alphanumeric CNPJ), email, phone, notes | CPF/CNPJ unique per firm |
+| `matters` (processo) | tenant_id, client_id, title, cnj_number (NNNNNNN-DD.AAAA.J.TR.OOOO, check digits validated, nullable for pre-litigation), court, comarca, vara, area (trabalhista, civel, tributario, consumidor, familia, previdenciario, empresarial, outro), status (ativo, suspenso, encerrado, arquivado), description, opened_at | CNJ number unique per firm |
+| `matter_parties` | tenant_id, matter_id, name, kind, role (autor, reu, reclamante, reclamada, exequente, executado, terceiro, outro), is_client, document number (encrypted + hash) | |
+| `matter_members` | tenant_id, matter_id, user_id, responsibility (responsavel / equipe) | Who works on it. Foreign key to `memberships`, so only firm members can be assigned |
+| `matter_events` (timeline) | tenant_id, matter_id, kind (processo_criado, documento_enviado, documento_ready, parte_adicionada, status_alterado… later movimentação, intimação, AI output, approval), summary (pt-BR), source (manual / sistema / datajud), actor_user_id, payload, occurred_at | Append-only for the app |
 
-### Documents — Phase 2
+### Documents — Phase 2a (implemented)
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `documents` | tenant_id, matter_id, title, doc_class (petição, decisão, sentença, contrato, procuração…), classified_by (ai/user) | |
-| `document_versions` | tenant_id, document_id, storage_key, sha256, mime, pages, ocr_status | Files are immutable; new upload = new version |
-| `document_pages` | tenant_id, document_version_id, page_no, text, ocr_confidence | Extracted text, treated as untrusted data |
-| `document_chunks` | tenant_id, document_version_id, page_from, page_to, char_start, char_end, text, tsv (tsvector), embedding (vector) | RLS applies to vector search too |
+| `documents` | tenant_id, matter_id, title, doc_class (filled by classification in 2b), current_version_id | |
+| `document_versions` | tenant_id, document_id, version_no, storage_key, original_filename, declared_content_type, detected_type (from content), size_bytes, sha256, page_count, ocr_page_count, min_ocr_confidence, status (pending_upload → uploaded → processing → ready / failed / rejected), error_code | Files are immutable; new upload = new version. `documents.current_version_id` = newest ready version |
+| `document_pages` | tenant_id, document_version_id, page_number, text, method (text_layer / ocr / docx), ocr_confidence | Extracted text, treated as untrusted data |
+| `document_chunks` | tenant_id, document_version_id, page_number, char_start, char_end, text, tsv (generated, `portuguese`), embedding (vector, filled from Phase 3) | Never crosses pages; `page.text[char_start:char_end] == text`. RLS applies to text and vector search |
 | `extracted_facts` | tenant_id, document_version_id, fact_type (date, value, party, pedido…), value, source_chunk_id, char_start, char_end, confidence | Every fact points to its exact span |
 
 ### AI work, review, approval — Phases 2–4

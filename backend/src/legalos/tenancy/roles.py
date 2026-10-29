@@ -19,6 +19,7 @@ class Permission(StrEnum):
     MANAGE_MEMBERS = "manage_members"
     VIEW_AUDIT_LOG = "view_audit_log"
     VIEW_MEMBERS = "view_members"
+    VIEW_MATTERS = "view_matters"
     MANAGE_CLIENTS = "manage_clients"
     MANAGE_DOCUMENTS = "manage_documents"
     MANAGE_TASKS = "manage_tasks"
@@ -32,6 +33,7 @@ class Permission(StrEnum):
 
 _LAWYER_WORK = {
     Permission.VIEW_MEMBERS,
+    Permission.VIEW_MATTERS,
     Permission.MANAGE_CLIENTS,
     Permission.MANAGE_DOCUMENTS,
     Permission.MANAGE_TASKS,
@@ -48,6 +50,7 @@ ROLE_PERMISSIONS: dict[Role, frozenset[Permission]] = {
     Role.ADMINISTRATIVO: frozenset(
         {
             Permission.VIEW_MEMBERS,
+            Permission.VIEW_MATTERS,
             Permission.MANAGE_CLIENTS,
             Permission.MANAGE_DOCUMENTS,
             Permission.MANAGE_TASKS,

@@ -7,6 +7,7 @@ import socket
 import time
 from types import FrameType
 
+from legalos import all_models  # noqa: F401  (resolves foreign keys between models)
 from legalos.config import get_settings
 from legalos.core.logging import configure_logging
 from legalos.jobs import handlers  # noqa: F401  (registers job handlers)

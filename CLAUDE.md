@@ -9,8 +9,10 @@ for scope and rules).
 - Phase 0 (plan) — approved 2026-10-27.
 - Phase 1 (foundations) — done. Auth + MFA, roles, tenants with RLS, audit log, job
   queue, object storage, CI, seed data.
-- **Phase 2 (matters + documents) — plan proposed in `docs/phase-2-plan.md`, awaiting
-  founder approval.** Split into 2a (no AI) and 2b (AI on documents).
+- Phase 2 plan approved 2026-10-29 (`docs/phase-2-plan.md`), split into 2a and 2b.
+- **Phase 2a (matters + documents, no AI) — done, awaiting founder review.** Clients,
+  processos, parties, team, timeline, uploads, text extraction/OCR, search, viewer.
+- Next: Phase 2b (AI on documents). Needs `ANTHROPIC_API_KEY` in the environment.
 - Test documents: synthetic, or public sources whose terms were checked. Never collect
   law firms' documents. No real client data until a lawyer reviews LGPD basics.
 
@@ -87,6 +89,14 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
   each one bypasses RLS.
 - Never log document text, prompts, or identifiers. Logs are JSON, scrubbed as a safety
   net (`legalos.core.logging`).
+- Foreign keys between firm tables are composite `(tenant_id, id)`; follow that pattern
+  for new tables (see migration 0002).
+- New model modules must be added to `legalos/all_models.py`, or the worker cannot resolve
+  foreign keys (a test checks this).
+- CPF/CNPJ: store with `matters.service.protect_document_number` (encrypted + keyed
+  hash); return masked except in audited detail views.
+- Uploaded files are untrusted: detect type from content (`documents.filetypes`), parse
+  only in the worker, keep the limits in `documents.extraction`.
 
 ## Commands
 
@@ -96,6 +106,8 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
 | Seed fictional firms | `docker compose run --rm api python -m legalos.seed` |
 | Backend tests | `cd backend && uv run pytest` (needs Postgres+pgvector; `LEGALOS_TEST_ADMIN_URL`, default `postgresql://postgres:postgres@localhost:5432/postgres`) |
 | Storage integration test | set `LEGALOS_TEST_S3_ENDPOINT=http://localhost:8333` with SeaweedFS running |
+| OCR accuracy report | `cd backend && uv run python scripts/ocr_eval.py` (needs `tesseract` + `tesseract-ocr-por`) |
+| Synthetic test documents | `cd backend && uv run python scripts/make_test_corpus.py ../test-documents` |
 | Backend lint/format/types | `uv run ruff check . && uv run ruff format --check . && uv run mypy` |
 | New migration | add a file in `backend/alembic/versions/` (SQL via `op.execute`) |
 | Frontend | `cd frontend && pnpm lint && pnpm typecheck && pnpm test && pnpm build` |

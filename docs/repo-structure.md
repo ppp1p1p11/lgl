@@ -22,14 +22,15 @@ not create empty scaffolding ahead of time.
 │   │   ├── config.py             # settings from LEGALOS_* environment variables
 │   │   ├── dbadmin.py            # one-time DB bootstrap: owner role, app role, database
 │   │   ├── seed.py               # fictional firms and users (dev only)
+│   │   ├── all_models.py         # imports every model (needed by the worker)
 │   │   ├── core/                 # db session + tenant context, crypto, logging, middleware
 │   │   ├── audit/                # append-only audit log
 │   │   ├── auth/                 # login, MFA, sessions, roles
 │   │   ├── tenancy/              # firms, memberships, seed data
 │   │   ├── storage/              # object storage, signed URLs
 │   │   ├── jobs/                 # Postgres job queue
-│   │   ├── matters/              # clients, processos, parties, timeline   (Phase 2)
-│   │   ├── documents/            # upload, OCR, classify, extract, chunk    (Phase 2)
+│   │   ├── matters/              # clients, processos, parties, team, timeline
+│   │   ├── documents/            # upload, file types, extraction/OCR, chunking, search
 │   │   ├── gateway/              # AI gateway: providers, redaction, call log (Phase 2)
 │   │   ├── agents/               # orchestrators, scoped tools, traces     (Phase 2+)
 │   │   ├── citations/            # citation verifier                       (Phase 2+)
@@ -37,7 +38,9 @@ not create empty scaffolding ahead of time.
 │   │   ├── drafting/             # templates, generation, .docx export     (Phase 4)
 │   │   ├── deadlines/            # rule sets (cpc, clt, juizados), calendars (Phase 5)
 │   │   └── datajud/              # read-only DataJud connector             (Phase 5)
+│   ├── scripts/                  # export_openapi, ocr_eval, make_test_corpus
 │   └── tests/
+│       ├── corpus/               # synthetic test-document generator (ADR-0007)
 │       ├── test_tenant_isolation.py   # tenant A cannot read tenant B, incl. vectors
 │       └── ...
 │

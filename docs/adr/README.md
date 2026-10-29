@@ -37,3 +37,6 @@ Briefly, and why not.
 | [0002](0002-tenant-isolation-with-rls.md) | Tenant isolation with Postgres Row-Level Security | Accepted |
 | [0003](0003-authentication-in-house.md) | Authentication and MFA built into the backend | Accepted |
 | [0004](0004-postgres-job-queue.md) | Postgres-backed job queue for the MVP | Accepted |
+| [0005](0005-ocr-engine.md) | OCR with self-hosted Tesseract | Accepted |
+| 0006 | AI model and gateway (Phase 2b) | Planned |
+| [0007](0007-test-documents.md) | Test documents are synthetic or verified-public only | Accepted |

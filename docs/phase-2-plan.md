@@ -1,4 +1,6 @@
-# Phase 2 plan — Matters + documents (proposal, awaiting approval)
+# Phase 2 plan — Matters + documents
+
+Status: approved 2026-10-29. **2a done** (awaiting founder review); 2b not started.
 
 **Goal:** a lawyer creates a client and a processo, uploads PDFs, and gets:
 - the extracted text, including from scanned pages

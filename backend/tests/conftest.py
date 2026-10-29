@@ -147,6 +147,51 @@ def make_member(owner_engine: Engine) -> Callable[..., Member]:
 
 
 @pytest.fixture
+def make_version(owner_engine: Engine) -> Callable[[uuid.UUID], uuid.UUID]:
+    """Create client -> matter -> document -> version (status ready) for a firm."""
+    from legalos.documents.models import Document, DocumentVersion
+    from legalos.matters.models import Client, Matter
+
+    def _make(tenant_id: uuid.UUID) -> uuid.UUID:
+        client_id, matter_id, doc_id, version_id = (uuid.uuid4() for _ in range(4))
+        with Session(owner_engine) as db, db.begin():
+            db.add(Client(id=client_id, tenant_id=tenant_id, kind="PF", name="Cliente Teste"))
+            db.flush()
+            db.add(
+                Matter(
+                    id=matter_id,
+                    tenant_id=tenant_id,
+                    client_id=client_id,
+                    title="Processo teste",
+                    area="civel",
+                )
+            )
+            db.flush()
+            db.add(
+                Document(
+                    id=doc_id, tenant_id=tenant_id, matter_id=matter_id, title="Documento teste"
+                )
+            )
+            db.flush()
+            db.add(
+                DocumentVersion(
+                    id=version_id,
+                    tenant_id=tenant_id,
+                    document_id=doc_id,
+                    version_no=1,
+                    original_filename="teste.pdf",
+                    storage_key=f"tenants/{tenant_id}/documents/{doc_id}/{version_id}",
+                    status="ready",
+                )
+            )
+            db.flush()
+            db.query(Document).filter_by(id=doc_id).update({"current_version_id": version_id})
+        return version_id
+
+    return _make
+
+
+@pytest.fixture
 def client() -> Iterator[TestClient]:
     from legalos.main import app
 

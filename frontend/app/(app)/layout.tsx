@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { api, type Me } from "@/lib/api/client";
 import { t } from "@/lib/i18n";
+import { SessionProvider } from "@/lib/session";
 
 /** Shell for signed-in pages: checks the session, shows the firm switcher and logout. */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <nav>
           <strong>{t.app.name}</strong>
           <Link href="/processos">{t.shell.processos}</Link>
+          <Link href="/clientes">{t.shell.clientes}</Link>
         </nav>
         <nav>
           {me.firms.length > 0 && (
@@ -72,7 +74,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
         </nav>
       </header>
-      <main>{me.current_firm ? children : <p>{t.shell.noFirm}</p>}</main>
+      <main>
+        {me.current_firm ? (
+          // Remount pages when the firm changes, so no data from the previous firm lingers.
+          <SessionProvider value={me} key={me.current_firm.id}>
+            {children}
+          </SessionProvider>
+        ) : (
+          <p>{t.shell.noFirm}</p>
+        )}
+      </main>
     </>
   );
 }

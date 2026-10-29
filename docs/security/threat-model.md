@@ -1,4 +1,4 @@
-# Threat model (v1, Phase 1)
+# Threat model (v2, Phase 2a)
 
 This document lists what we protect, from whom, and how. It is updated every phase.
 Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase given) · **⚠️ open risk**.
@@ -86,8 +86,22 @@ Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase giv
 |---|---|---|
 | Someone edits or deletes audit history | The app role has only `INSERT` and `SELECT` on `audit_log` | ✅ |
 | Failed actions not recorded | Failed logins and MFA failures are written in a separate transaction, so they survive the request's rollback | ✅ tested |
-| Reads of sensitive documents not recorded | `audit.record` on every sensitive read (documents arrive in Phase 2) | 🕒 Phase 2 |
+| Reads of sensitive documents not recorded | Audit events for reading extracted text (`document.text_read`), opening the file (`document.file_opened`), searching a matter (`matter.searched`) and viewing a full CPF/CNPJ (`client.identifier_read`) | ✅ tested |
 | Audit IP shows the proxy, not the user | Configure trusted forwarding headers at the load balancer | ⚠️ VERIFY INF-7 |
+
+### 4.5b Uploaded files (Phase 2a)
+
+| Threat | Mitigation | Status |
+|---|---|---|
+| Malicious file disguised as a PDF (wrong extension or declared type) | The real type is detected from the file content; anything not PDF/DOCX/JPG/PNG is rejected and **deleted** from storage | ✅ tested |
+| Oversized upload (a signed PUT URL cannot limit size) | Declared size checked before issuing the URL; actual size checked at completion; files over 50 MB rejected and deleted | ✅ tested |
+| Hostile or malformed documents attacking the parser (decompression bombs, huge pages, endless OCR) | Parsing only in the worker, never in the API. Page limit 1,000; rendered image capped at 40 megapixels; Pillow's bomb protection; DOCX uncompressed size limit; OCR in a separate process with a 120-second timeout | ✅ (limits); ⚠️ the worker is not yet sandboxed from the database network (Phase 6: separate container with minimal permissions) |
+| Text in a document injected into the UI (XSS) | Extracted text is rendered as plain text by React; search highlights use control characters, not HTML | ✅ tested |
+| Uploading into another firm's matter or storage area | Matter looked up under RLS (another firm's is 404); storage keys built server-side under the firm's prefix | ✅ tested |
+| Browser uploads from other websites | Storage CORS allows only the app's own origins | ✅ |
+| Duplicate CPF/CNPJ or cross-firm links | Unique keyed hash per firm; composite foreign keys reject links between firms even for the owner role | ✅ tested |
+| Jobs that keep failing leave documents "queued" forever | The final attempt marks the version `failed` with a reason | ✅ tested |
+| Malware stored and later downloaded by a colleague | Not scanned yet. Files are only served to the same firm with short-lived links, and PDF/images are displayed by the browser | ⚠️ add antivirus scanning before pilot (Phase 6) |
 
 ### 4.6 Data protection and residency
 
@@ -106,7 +120,7 @@ Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase giv
 | Malicious install scripts (npm) | pnpm blocks dependency build scripts by default | ✅ |
 | Base image drift | Pinned image tags; Dependabot for Dockerfiles | ✅ |
 
-## 5. Known gaps after Phase 1
+## 5. Known gaps after Phase 2a
 
 1. No password reset or invitation flow (needs transactional email, VERIFY INF-5).
    Accounts are created by provisioning scripts for now.
@@ -114,3 +128,7 @@ Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase giv
 3. The encryption key comes from an environment variable. Move it to a cloud secret
    manager / KMS before any real data (Phase 6).
 4. No external security review yet. Planned before the pilot.
+5. No antivirus scanning of uploaded files, and the worker that parses them is not
+   isolated yet (Phase 6).
+6. Uploads that are never completed leave `pending_upload` rows (and possibly orphan
+   objects). A cleanup job is planned for Phase 6.

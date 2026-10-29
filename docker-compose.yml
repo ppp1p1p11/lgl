@@ -22,7 +22,10 @@ services:
 
   storage:
     image: chrislusf/seaweedfs:4.00
-    command: server -dir=/data -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
+    # Small volumes: SeaweedFS pre-allocates disk space per volume.
+    command: >
+      server -dir=/data -master.volumeSizeLimitMB=256 -volume.max=20
+      -s3 -s3.port=8333 -s3.config=/etc/seaweedfs/s3.json
     ports: ["127.0.0.1:8333:8333"]
     volumes:
       - storage-data:/data

@@ -30,7 +30,7 @@ Status key: ⬜ open · 🟨 partially checked · ✅ confirmed · ❌ rejected 
 |---|---|---|---|---|---|
 | INF-1 | Which cloud? Confirm that the São Paulo region of the chosen provider offers: managed PostgreSQL **with the pgvector extension** (which version?), S3-compatible storage with encryption at rest, backups kept in-region, a container service, and log storage | Provider region service lists; managed Postgres "supported extensions" page | C, F decides | Phase 1 end / Phase 6 | ⬜ |
 | INF-2 | pgvector: does the version we get support filtered approximate search that still returns enough results when filtered by tenant under RLS (e.g. "iterative index scans")? | pgvector changelog / README | C | Phase 2 (when the ANN index is added) | 🟨 Local dev and CI use pgvector 0.8.1. Phase 1 proves *isolation* (exact search, RLS applied). *Recall* with an ANN index under RLS must be tested once the embedding model and index exist |
-| INF-3 | OCR: is a managed OCR service (e.g. AWS Textract) available in São Paulo with good Portuguese support, or do we self-host (e.g. Tesseract with the `por` model, or OCRmyPDF)? Compare accuracy on real scanned court PDFs | Provider region list + language support page; a test on 10 real anonymized PDFs | C + F supplies sample PDFs | Phase 2 | ⬜ |
+| INF-3 | OCR: is a managed OCR service (e.g. AWS Textract) available in São Paulo with good Portuguese support, or do we self-host (e.g. Tesseract with the `por` model)? Compare accuracy on real scanned court PDFs | Provider region list + language support page; a test on 10 real anonymized PDFs | C + F supplies sample PDFs | Phase 2 | 🟨 Self-hosted Tesseract chosen (ADR-0005): ≤1% character errors on synthetic scans; unreadable scans flagged. Still to repeat on real anonymized PDFs |
 | INF-4 | Error tracking / observability: where does the vendor store data? Is a Brazil or self-hosted option available? (e.g. Sentry SaaS data regions vs self-hosted Sentry/GlitchTip) | Vendor data-residency docs | C, F decides | Phase 1 (local), Phase 6 (prod) | ⬜ |
 | INF-5 | Transactional email (invites, MFA recovery): which provider can send from Brazil, and does it store message content? | Provider docs | C | Phase 1 end | ⬜ |
 | INF-6 | Managed PostgreSQL permissions: can we (a) create a second login role that owns no tables and has no `BYPASSRLS`, (b) run `CREATE EXTENSION vector`, and (c) create `SECURITY DEFINER` functions owned by the migration role? Our isolation design (ADR-0002) depends on all three | Managed Postgres docs (e.g. RDS "master user" / `rds_superuser` privileges) | C | Phase 6 (before first cloud deploy) | ⬜ |
@@ -73,6 +73,14 @@ or our draft plan refers to; **they are not yet verified**.
 | DL-7 | Labor deadlines under the CLT (counting in dias úteis after the 2017 labor reform; recesso; doubled deadlines in labor courts) | CLT art. 775 and related; Lei 13.467/2017; TST rules | C, L | Phase 5 | ⬜ |
 | DL-8 | Juizados Especiais counting rules | Lei 9.099/1995 (incl. any later amendment on dias úteis); Lei 10.259/2001; Lei 12.153/2009 | C, L | Phase 5 | ⬜ |
 | DL-9 | National holidays and each court's holiday / suspension calendar: where each tribunal publishes it, and in what format | Federal holiday laws; each TJ/TRF/TRT's annual calendar resolution | C (collect), F/L (choose pilot courts) | Phase 5 | ⬜ |
+
+## 4b. Identifier formats
+
+| # | Question | Where to check | Owner | Needed by | Status |
+|---|---|---|---|---|---|
+| ID-1 | CPF check-digit algorithm (implemented in `core/br_ids.py`) | Receita Federal documentation | C | Phase 2 | 🟨 Standard algorithm; matches the commonly used valid test number |
+| ID-2 | **Alphanumeric CNPJ** (new CNPJs may contain letters): format and check-digit rule (characters valued as ASCII − 48). Start date and transition rules | Receita Federal: Instrução Normativa on the alphanumeric CNPJ and its technical note | C | Phase 2 | 🟨 Implemented; validates the example published by the Receita Federal. Confirm against the current normative text |
+| ID-3 | CNJ unified process number: format NNNNNNN-DD.AAAA.J.TR.OOOO and check digits (ISO 7064 mod 97-10) | CNJ Resolução 65/2008 and its annex | C | Phase 2 | 🟨 Implemented; confirm the formula and segment/court codes (e.g. TJSP = 8.26) against the official text |
 
 ## 5. Regulation, LGPD, OAB, AI governance
 

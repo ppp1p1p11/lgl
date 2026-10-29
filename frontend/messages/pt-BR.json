@@ -31,7 +31,8 @@
     "firm": "Escritório",
     "logout": "Sair",
     "processos": "Processos",
-    "noFirm": "Sua conta ainda não está vinculada a nenhum escritório. Fale com o sócio responsável."
+    "noFirm": "Sua conta ainda não está vinculada a nenhum escritório. Fale com o sócio responsável.",
+    "clientes": "Clientes"
   },
   "roles": {
     "socio": "Sócio(a)",
@@ -42,7 +43,41 @@
   "processos": {
     "title": "Processos",
     "emptyTitle": "Nenhum processo cadastrado ainda",
-    "emptyBody": "O cadastro de clientes e processos chega na próxima fase do produto."
+    "emptyBody": "Cadastre o primeiro processo para enviar documentos.",
+    "new": "Novo processo",
+    "searchPlaceholder": "Buscar por título, número ou cliente",
+    "empty": "Nenhum processo encontrado.",
+    "fields": {
+      "title": "Título",
+      "client": "Cliente",
+      "cnj": "Número CNJ",
+      "cnjHint": "Deixe em branco para casos pré-processuais",
+      "area": "Área",
+      "court": "Tribunal",
+      "comarca": "Comarca",
+      "vara": "Vara / órgão",
+      "status": "Situação",
+      "description": "Descrição",
+      "openedAt": "Data de início"
+    },
+    "areas": {
+      "trabalhista": "Trabalhista",
+      "civel": "Cível",
+      "tributario": "Tributário",
+      "consumidor": "Consumidor",
+      "familia": "Família",
+      "previdenciario": "Previdenciário",
+      "empresarial": "Empresarial",
+      "outro": "Outro"
+    },
+    "statuses": {
+      "ativo": "Ativo",
+      "suspenso": "Suspenso",
+      "encerrado": "Encerrado",
+      "arquivado": "Arquivado"
+    },
+    "noClients": "Cadastre um cliente antes de criar um processo.",
+    "selectClient": "Selecione o cliente"
   },
   "errors": {
     "invalid_credentials": "E-mail ou senha incorretos.",
@@ -53,6 +88,122 @@
     "not_a_member": "Você não faz parte deste escritório.",
     "forbidden": "Você não tem permissão para esta ação.",
     "no_firm_selected": "Selecione um escritório para continuar.",
-    "unknown": "Ocorreu um erro inesperado. Tente novamente."
+    "unknown": "Ocorreu um erro inesperado. Tente novamente.",
+    "invalid_cpf": "CPF inválido.",
+    "invalid_cnpj": "CNPJ inválido.",
+    "invalid_cnj_number": "Número CNJ inválido (confira os dígitos verificadores).",
+    "client_already_exists": "Já existe um cliente com este CPF/CNPJ.",
+    "matter_already_exists": "Já existe um processo com este número.",
+    "client_not_found": "Cliente não encontrado.",
+    "matter_not_found": "Processo não encontrado.",
+    "document_not_found": "Documento não encontrado.",
+    "not_a_firm_member": "Esta pessoa não faz parte do escritório.",
+    "unsupported_type": "Tipo de arquivo não aceito. Envie PDF, Word (.docx), JPG ou PNG.",
+    "file_too_large": "Arquivo maior que 50 MB.",
+    "file_empty": "Arquivo vazio.",
+    "upload_not_found": "O envio do arquivo não foi concluído. Tente novamente.",
+    "upload_failed": "Falha ao enviar o arquivo. Verifique sua conexão e tente novamente."
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "add": "Adicionar",
+    "search": "Buscar",
+    "loading": "Carregando…",
+    "optional": "opcional",
+    "none": "—",
+    "back": "Voltar"
+  },
+  "clientes": {
+    "title": "Clientes",
+    "new": "Novo cliente",
+    "kind": "Tipo",
+    "kinds": {
+      "PF": "Pessoa física",
+      "PJ": "Pessoa jurídica"
+    },
+    "name": "Nome / razão social",
+    "documentNumber": "CPF / CNPJ",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "empty": "Nenhum cliente cadastrado ainda.",
+    "searchPlaceholder": "Buscar por nome"
+  },
+  "processo": {
+    "documents": "Documentos",
+    "upload": "Enviar documentos",
+    "uploadHint": "PDF, Word (.docx), JPG ou PNG, até 50 MB cada.",
+    "uploading": "Enviando…",
+    "noDocuments": "Nenhum documento enviado.",
+    "parties": "Partes",
+    "addParty": "Adicionar parte",
+    "partyName": "Nome",
+    "partyRole": "Polo / papel",
+    "isClient": "É nosso cliente",
+    "noParties": "Nenhuma parte cadastrada.",
+    "team": "Equipe",
+    "timeline": "Linha do tempo",
+    "search": "Busca nos documentos",
+    "searchPlaceholder": "Buscar palavras nos documentos deste processo",
+    "noResults": "Nenhum trecho encontrado.",
+    "page": "pág.",
+    "responsibility": {
+      "responsavel": "Responsável",
+      "equipe": "Equipe"
+    },
+    "roles": {
+      "autor": "Autor",
+      "reu": "Réu",
+      "reclamante": "Reclamante",
+      "reclamada": "Reclamada",
+      "exequente": "Exequente",
+      "executado": "Executado",
+      "terceiro": "Terceiro",
+      "outro": "Outro"
+    },
+    "sources": {
+      "manual": "manual",
+      "sistema": "sistema",
+      "datajud": "DataJud"
+    }
+  },
+  "documento": {
+    "version": "Versão",
+    "versions": "Versões",
+    "newVersion": "Enviar nova versão",
+    "pages": "páginas",
+    "page": "Página",
+    "original": "Arquivo original",
+    "extracted": "Texto extraído",
+    "openOriginal": "Abrir arquivo original",
+    "noPreview": "Pré-visualização indisponível para este tipo de arquivo.",
+    "ocr": "Texto reconhecido por OCR",
+    "textLayer": "Texto do próprio arquivo",
+    "docx": "Texto do documento Word",
+    "confidence": "confiança",
+    "lowConfidence": "Texto pode conter erros: a digitalização tem baixa qualidade. Confira com o arquivo original.",
+    "processing": "O documento está sendo processado. Esta página será atualizada automaticamente.",
+    "status": {
+      "pending_upload": "Aguardando envio",
+      "uploaded": "Na fila",
+      "processing": "Processando",
+      "ready": "Pronto",
+      "failed": "Falhou",
+      "rejected": "Recusado"
+    },
+    "errors": {
+      "unsupported_type": "Tipo de arquivo não aceito (o conteúdo não é PDF, Word, JPG ou PNG).",
+      "file_too_large": "Arquivo maior que 50 MB.",
+      "pdf_encrypted": "PDF protegido por senha. Envie uma versão sem senha.",
+      "pdf_unreadable": "PDF corrompido ou ilegível.",
+      "pdf_empty": "PDF sem páginas.",
+      "too_many_pages": "PDF com páginas demais (máximo 1.000).",
+      "image_unreadable": "Imagem corrompida ou ilegível.",
+      "docx_unreadable": "Arquivo Word corrompido ou ilegível.",
+      "ocr_timeout": "O reconhecimento de texto demorou demais.",
+      "ocr_failed": "Falha no reconhecimento de texto.",
+      "processing_error": "Falha ao processar o documento. Tente enviar novamente."
+    },
+    "pageSingular": "página"
   }
 }

@@ -1,7 +1,9 @@
 """Job handlers. Each phase registers its own (OCR, embeddings, summaries…)."""
 
+# Importing a module registers its handlers.
 from sqlalchemy.orm import Session
 
+import legalos.documents.service  # noqa: F401
 from legalos.audit.service import record
 from legalos.jobs.models import Job
 from legalos.jobs.queue import handler

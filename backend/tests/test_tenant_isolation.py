@@ -27,20 +27,33 @@ TABLES_WITHOUT_RLS = {"alembic_version", "auth_attempts"}
 
 
 @pytest.fixture
-def two_firms(make_firm, make_member, owner_engine: Engine):
+def two_firms(make_firm, make_member, make_version, owner_engine: Engine):
     a, b = make_firm("Alfa"), make_firm("Beta")
     member_a, member_b = make_member(a), make_member(b)
+    version_a, version_b = make_version(a), make_version(b)
     # Tenant B's chunk is the *closest* match to the query vector used below, so a leak
     # would show up first in the results.
     with Session(owner_engine) as db, db.begin():
         db.add_all(
             [
-                DocumentChunk(tenant_id=a, text="contrato de locação Alfa", embedding=[1, 0, 0]),
-                DocumentChunk(tenant_id=a, text="petição inicial Alfa", embedding=[0, 1, 0]),
-                DocumentChunk(tenant_id=b, text="segredo do cliente Beta", embedding=[0, 0, 1]),
+                _chunk(a, version_a, "contrato de locação Alfa", [1, 0, 0]),
+                _chunk(a, version_a, "petição inicial Alfa", [0, 1, 0]),
+                _chunk(b, version_b, "segredo do cliente Beta", [0, 0, 1]),
             ]
         )
     return a, b, member_a, member_b
+
+
+def _chunk(tenant_id, version_id, text_, embedding) -> DocumentChunk:
+    return DocumentChunk(
+        tenant_id=tenant_id,
+        document_version_id=version_id,
+        page_number=1,
+        char_start=0,
+        char_end=len(text_),
+        text=text_,
+        embedding=embedding,
+    )
 
 
 # --- Database configuration ---------------------------------------------------------------
@@ -125,10 +138,13 @@ def test_no_tenant_context_sees_nothing(two_firms) -> None:
         assert db.scalar(select(func.count()).select_from(Membership)) == 0
 
 
-def test_cannot_insert_into_other_tenant(two_firms) -> None:
+def test_cannot_insert_into_other_tenant(two_firms, owner_db: Session) -> None:
     a, b, *_ = two_firms
+    version_b = owner_db.scalar(
+        select(DocumentChunk.document_version_id).where(DocumentChunk.tenant_id == b)
+    )
     with pytest.raises(ProgrammingError, match="row-level security"), app_db(tenant_id=a) as db:
-        db.add(DocumentChunk(tenant_id=b, text="injected", embedding=[1, 1, 1]))
+        db.add(_chunk(b, version_b, "injected", [1, 1, 1]))
         db.flush()
 
 

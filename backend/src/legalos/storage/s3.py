@@ -9,9 +9,11 @@ import re
 import uuid
 from functools import lru_cache
 from typing import TYPE_CHECKING
+from urllib.parse import quote
 
 import boto3
 from botocore.config import Config
+from botocore.exceptions import ClientError
 
 from legalos.config import get_settings
 
@@ -77,14 +79,43 @@ def signed_upload_url(tenant_id: uuid.UUID, key: str, content_type: str) -> str:
     )
 
 
-def signed_download_url(tenant_id: uuid.UUID, key: str) -> str:
+def signed_download_url(
+    tenant_id: uuid.UUID,
+    key: str,
+    *,
+    content_type: str | None = None,
+    filename: str | None = None,
+) -> str:
+    """Short-lived link to view a file inline in the browser."""
     ensure_tenant_key(tenant_id, key)
     settings = get_settings()
+    params = {"Bucket": settings.storage_bucket, "Key": key}
+    if content_type:
+        params["ResponseContentType"] = content_type
+    if filename:
+        params["ResponseContentDisposition"] = (
+            f"inline; filename*=UTF-8''{quote(filename, safe='')}"
+        )
     return _client(public=True).generate_presigned_url(
-        "get_object",
-        Params={"Bucket": settings.storage_bucket, "Key": key},
-        ExpiresIn=settings.signed_url_ttl_seconds,
+        "get_object", Params=params, ExpiresIn=settings.signed_url_ttl_seconds
     )
+
+
+def object_size(tenant_id: uuid.UUID, key: str) -> int | None:
+    """Size of a stored object in bytes, or None if it does not exist."""
+    ensure_tenant_key(tenant_id, key)
+    try:
+        head = _client(public=False).head_object(Bucket=get_settings().storage_bucket, Key=key)
+    except ClientError as e:
+        if e.response.get("Error", {}).get("Code") in ("404", "NoSuchKey", "NotFound"):
+            return None
+        raise
+    return int(head["ContentLength"])
+
+
+def delete_object(tenant_id: uuid.UUID, key: str) -> None:
+    ensure_tenant_key(tenant_id, key)
+    _client(public=False).delete_object(Bucket=get_settings().storage_bucket, Key=key)
 
 
 def put_bytes(tenant_id: uuid.UUID, key: str, data: bytes, content_type: str) -> None:

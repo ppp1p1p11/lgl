@@ -140,6 +140,126 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/clients": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Clients */
+    get: operations["list_clients_api_clients_get"];
+    put?: never;
+    /** Create Client */
+    post: operations["create_client_api_clients_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/clients/{client_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Client */
+    get: operations["get_client_api_clients__client_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/document-versions/{version_id}/complete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Complete Upload */
+    post: operations["complete_upload_api_document_versions__version_id__complete_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/document-versions/{version_id}/file-url": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get File Url */
+    get: operations["get_file_url_api_document_versions__version_id__file_url_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/document-versions/{version_id}/pages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Pages */
+    get: operations["get_pages_api_document_versions__version_id__pages_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/documents/{document_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Document */
+    get: operations["get_document_api_documents__document_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/documents/{document_id}/versions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Start New Version */
+    post: operations["start_new_version_api_documents__document_id__versions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/firm/members": {
     parameters: {
       query?: never;
@@ -174,6 +294,145 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/matters": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Matters */
+    get: operations["list_matters_api_matters_get"];
+    put?: never;
+    /** Create Matter */
+    post: operations["create_matter_api_matters_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Matter */
+    get: operations["get_matter_api_matters__matter_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Matter */
+    patch: operations["update_matter_api_matters__matter_id__patch"];
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/documents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Documents */
+    get: operations["list_documents_api_matters__matter_id__documents_get"];
+    put?: never;
+    /** Start Upload */
+    post: operations["start_upload_api_matters__matter_id__documents_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Events */
+    get: operations["list_events_api_matters__matter_id__events_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Set Member */
+    put: operations["set_member_api_matters__matter_id__members_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/parties": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Add Party */
+    post: operations["add_party_api_matters__matter_id__parties_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/parties/{party_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove Party */
+    delete: operations["remove_party_api_matters__matter_id__parties__party_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Search */
+    get: operations["search_api_matters__matter_id__search_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -199,6 +458,128 @@ export interface components {
        * Format: date-time
        */
       occurred_at: string;
+    };
+    /** ClientIn */
+    ClientIn: {
+      /** Document Number */
+      document_number?: string | null;
+      /** Email */
+      email?: string | null;
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: "PF" | "PJ";
+      /** Name */
+      name: string;
+      /** Notes */
+      notes?: string | null;
+      /** Phone */
+      phone?: string | null;
+    };
+    /** ClientOut */
+    ClientOut: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Document Number */
+      document_number: string | null;
+      /** Email */
+      email: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: "PF" | "PJ";
+      /** Name */
+      name: string;
+      /** Phone */
+      phone: string | null;
+    };
+    /** DocumentDetail */
+    DocumentDetail: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      current_version: components["schemas"]["VersionOut"] | null;
+      /** Doc Class */
+      doc_class: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      latest_version: components["schemas"]["VersionOut"];
+      /**
+       * Matter Id
+       * Format: uuid
+       */
+      matter_id: string;
+      /** Title */
+      title: string;
+      /** Versions */
+      versions: components["schemas"]["VersionOut"][];
+    };
+    /** DocumentOut */
+    DocumentOut: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      current_version: components["schemas"]["VersionOut"] | null;
+      /** Doc Class */
+      doc_class: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      latest_version: components["schemas"]["VersionOut"];
+      /**
+       * Matter Id
+       * Format: uuid
+       */
+      matter_id: string;
+      /** Title */
+      title: string;
+    };
+    /** EventOut */
+    EventOut: {
+      /** Actor User Id */
+      actor_user_id: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Kind */
+      kind: string;
+      /**
+       * Occurred At
+       * Format: date-time
+       */
+      occurred_at: string;
+      /** Source */
+      source: string;
+      /** Summary */
+      summary: string;
+    };
+    /** FileUrlOut */
+    FileUrlOut: {
+      /** Content Type */
+      content_type: string | null;
+      /** Url */
+      url: string;
     };
     /** FirmOut */
     FirmOut: {
@@ -235,6 +616,171 @@ export interface components {
     LoginResponse: {
       next_step: components["schemas"]["LoginNextStep"];
     };
+    /** MatterDetail */
+    MatterDetail: {
+      /**
+       * Area
+       * @enum {string}
+       */
+      area:
+        | "trabalhista"
+        | "civel"
+        | "tributario"
+        | "consumidor"
+        | "familia"
+        | "previdenciario"
+        | "empresarial"
+        | "outro";
+      /**
+       * Client Id
+       * Format: uuid
+       */
+      client_id: string;
+      /** Client Name */
+      client_name: string;
+      /** Cnj Number */
+      cnj_number: string | null;
+      /** Comarca */
+      comarca: string | null;
+      /** Court */
+      court: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Description */
+      description: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Members */
+      members: components["schemas"]["legalos__matters__router__MemberOut"][];
+      /** Opened At */
+      opened_at: string | null;
+      /** Parties */
+      parties: components["schemas"]["PartyOut"][];
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ativo" | "suspenso" | "encerrado" | "arquivado";
+      /** Title */
+      title: string;
+      /** Vara */
+      vara: string | null;
+    };
+    /** MatterIn */
+    MatterIn: {
+      /**
+       * Area
+       * @enum {string}
+       */
+      area:
+        | "trabalhista"
+        | "civel"
+        | "tributario"
+        | "consumidor"
+        | "familia"
+        | "previdenciario"
+        | "empresarial"
+        | "outro";
+      /**
+       * Client Id
+       * Format: uuid
+       */
+      client_id: string;
+      /** Cnj Number */
+      cnj_number?: string | null;
+      /** Comarca */
+      comarca?: string | null;
+      /** Court */
+      court?: string | null;
+      /** Description */
+      description?: string | null;
+      /** Opened At */
+      opened_at?: string | null;
+      /** Title */
+      title: string;
+      /** Vara */
+      vara?: string | null;
+    };
+    /** MatterPatch */
+    MatterPatch: {
+      /** Area */
+      area?:
+        | (
+            | "trabalhista"
+            | "civel"
+            | "tributario"
+            | "consumidor"
+            | "familia"
+            | "previdenciario"
+            | "empresarial"
+            | "outro"
+          )
+        | null;
+      /** Cnj Number */
+      cnj_number?: string | null;
+      /** Comarca */
+      comarca?: string | null;
+      /** Court */
+      court?: string | null;
+      /** Description */
+      description?: string | null;
+      /** Status */
+      status?: ("ativo" | "suspenso" | "encerrado" | "arquivado") | null;
+      /** Title */
+      title?: string | null;
+      /** Vara */
+      vara?: string | null;
+    };
+    /** MatterSummary */
+    MatterSummary: {
+      /**
+       * Area
+       * @enum {string}
+       */
+      area:
+        | "trabalhista"
+        | "civel"
+        | "tributario"
+        | "consumidor"
+        | "familia"
+        | "previdenciario"
+        | "empresarial"
+        | "outro";
+      /**
+       * Client Id
+       * Format: uuid
+       */
+      client_id: string;
+      /** Client Name */
+      client_name: string;
+      /** Cnj Number */
+      cnj_number: string | null;
+      /** Court */
+      court: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ativo" | "suspenso" | "encerrado" | "arquivado";
+      /** Title */
+      title: string;
+    };
     /** MeResponse */
     MeResponse: {
       current_firm: components["schemas"]["FirmOut"] | null;
@@ -246,13 +792,14 @@ export interface components {
       permissions: components["schemas"]["Permission"][];
       user: components["schemas"]["UserOut"];
     };
-    /** MemberOut */
-    MemberOut: {
-      /** Email */
-      email: string;
-      /** Name */
-      name: string;
-      role: components["schemas"]["Role"];
+    /** MemberIn */
+    MemberIn: {
+      /**
+       * Responsibility
+       * @default equipe
+       * @enum {string}
+       */
+      responsibility: "responsavel" | "equipe";
       /**
        * User Id
        * Format: uuid
@@ -283,6 +830,78 @@ export interface components {
       /** Recovery Code */
       recovery_code?: string | null;
     };
+    /** PageOut */
+    PageOut: {
+      /** Low Ocr Confidence */
+      low_ocr_confidence: boolean;
+      /**
+       * Method
+       * @enum {string}
+       */
+      method: "text_layer" | "ocr" | "docx";
+      /** Ocr Confidence */
+      ocr_confidence: number | null;
+      /** Page Number */
+      page_number: number;
+      /** Text */
+      text: string;
+    };
+    /** PartyIn */
+    PartyIn: {
+      /** Document Number */
+      document_number?: string | null;
+      /**
+       * Is Client
+       * @default false
+       */
+      is_client: boolean;
+      /** Kind */
+      kind?: ("PF" | "PJ") | null;
+      /** Name */
+      name: string;
+      /**
+       * Role
+       * @enum {string}
+       */
+      role:
+        | "autor"
+        | "reu"
+        | "reclamante"
+        | "reclamada"
+        | "exequente"
+        | "executado"
+        | "terceiro"
+        | "outro";
+    };
+    /** PartyOut */
+    PartyOut: {
+      /** Document Number */
+      document_number: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Client */
+      is_client: boolean;
+      /** Kind */
+      kind: ("PF" | "PJ") | null;
+      /** Name */
+      name: string;
+      /**
+       * Role
+       * @enum {string}
+       */
+      role:
+        | "autor"
+        | "reu"
+        | "reclamante"
+        | "reclamada"
+        | "exequente"
+        | "executado"
+        | "terceiro"
+        | "outro";
+    };
     /**
      * Permission
      * @enum {string}
@@ -292,6 +911,7 @@ export interface components {
       | "manage_members"
       | "view_audit_log"
       | "view_members"
+      | "view_matters"
       | "manage_clients"
       | "manage_documents"
       | "manage_tasks"
@@ -304,6 +924,25 @@ export interface components {
      * @enum {string}
      */
     Role: "socio" | "advogado" | "estagiario" | "administrativo";
+    /** SearchHitOut */
+    SearchHitOut: {
+      /**
+       * Document Id
+       * Format: uuid
+       */
+      document_id: string;
+      /** Document Title */
+      document_title: string;
+      /** Page Number */
+      page_number: number;
+      /** Snippet */
+      snippet: string;
+      /**
+       * Version Id
+       * Format: uuid
+       */
+      version_id: string;
+    };
     /** SwitchFirmRequest */
     SwitchFirmRequest: {
       /**
@@ -311,6 +950,34 @@ export interface components {
        * Format: uuid
        */
       tenant_id: string;
+    };
+    /** UploadRequest */
+    UploadRequest: {
+      /** Content Type */
+      content_type: string;
+      /** Filename */
+      filename: string;
+      /** Size Bytes */
+      size_bytes: number;
+      /** Title */
+      title?: string | null;
+    };
+    /** UploadTicketOut */
+    UploadTicketOut: {
+      /** Content Type */
+      content_type: string;
+      /**
+       * Document Id
+       * Format: uuid
+       */
+      document_id: string;
+      /** Upload Url */
+      upload_url: string;
+      /**
+       * Version Id
+       * Format: uuid
+       */
+      version_id: string;
     };
     /** UserOut */
     UserOut: {
@@ -336,6 +1003,72 @@ export interface components {
       msg: string;
       /** Error Type */
       type: string;
+    };
+    /** VersionOut */
+    VersionOut: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Detected Type */
+      detected_type: string | null;
+      /** Error Code */
+      error_code: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Low Ocr Confidence */
+      low_ocr_confidence: boolean;
+      /** Min Ocr Confidence */
+      min_ocr_confidence: number | null;
+      /** Ocr Page Count */
+      ocr_page_count: number | null;
+      /** Original Filename */
+      original_filename: string;
+      /** Page Count */
+      page_count: number | null;
+      /** Processed At */
+      processed_at: string | null;
+      /** Size Bytes */
+      size_bytes: number | null;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "pending_upload" | "uploaded" | "processing" | "ready" | "failed" | "rejected";
+      /** Version No */
+      version_no: number;
+    };
+    /** MemberOut */
+    legalos__matters__router__MemberOut: {
+      /** Name */
+      name: string;
+      /**
+       * Responsibility
+       * @enum {string}
+       */
+      responsibility: "responsavel" | "equipe";
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+    };
+    /** MemberOut */
+    legalos__tenancy__router__MemberOut: {
+      /** Email */
+      email: string;
+      /** Name */
+      name: string;
+      role: components["schemas"]["Role"];
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
     };
   };
   responses: never;
@@ -563,6 +1296,260 @@ export interface operations {
       };
     };
   };
+  list_clients_api_clients_get: {
+    parameters: {
+      query?: {
+        q?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClientOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_client_api_clients_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ClientIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClientOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_client_api_clients__client_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        client_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ClientOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  complete_upload_api_document_versions__version_id__complete_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        version_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VersionOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_file_url_api_document_versions__version_id__file_url_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        version_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FileUrlOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_pages_api_document_versions__version_id__pages_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        version_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PageOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_document_api_documents__document_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  start_new_version_api_documents__document_id__versions_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        document_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UploadRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UploadTicketOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   list_members_api_firm_members_get: {
     parameters: {
       query?: never;
@@ -578,7 +1565,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["MemberOut"][];
+          "application/json": components["schemas"]["legalos__tenancy__router__MemberOut"][];
         };
       };
     };
@@ -601,6 +1588,369 @@ export interface operations {
           "application/json": {
             [key: string]: string;
           };
+        };
+      };
+    };
+  };
+  list_matters_api_matters_get: {
+    parameters: {
+      query?: {
+        q?: string | null;
+        client_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterSummary"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_matter_api_matters_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MatterIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_matter_api_matters__matter_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_matter_api_matters__matter_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MatterPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_documents_api_matters__matter_id__documents_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  start_upload_api_matters__matter_id__documents_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UploadRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UploadTicketOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_events_api_matters__matter_id__events_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  set_member_api_matters__matter_id__members_put: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MemberIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  add_party_api_matters__matter_id__parties_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PartyIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  remove_party_api_matters__matter_id__parties__party_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+        party_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MatterDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  search_api_matters__matter_id__search_get: {
+    parameters: {
+      query: {
+        q: string;
+      };
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SearchHitOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

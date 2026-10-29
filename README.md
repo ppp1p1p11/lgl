@@ -9,9 +9,10 @@ propose deadlines. A lawyer approves every consequential output.
   [`docs/phase-0-plan.md`](docs/phase-0-plan.md))
 - Conventions for AI-assisted development: [`CLAUDE.md`](CLAUDE.md)
 
-**Status:** Phase 1 (foundations) is done. You can log in with MFA, switch between firms
-and see an empty "Processos" page. Firm isolation is enforced by the database and covered
-by tests. There are no AI features yet.
+**Status:** Phase 2a is done. You can log in with MFA, register clients and processos,
+upload documents (PDF, Word, photos), read their text (including scanned pages, via OCR)
+next to the original, and search inside a processo. Firm isolation is enforced by the
+database and covered by tests. AI features arrive in Phase 2b.
 
 ## Run it on your computer
 
@@ -37,6 +38,17 @@ The first login asks you to set up MFA. Scan the QR code with any authenticator 
 (Google Authenticator, Microsoft Authenticator, 1Password…), type the 6-digit code, and
 save the recovery codes it shows.
 
+To try uploads, generate fictional test documents (digital PDFs, scans of different
+quality, photos and Word files). This needs [uv](https://docs.astral.sh/uv/) installed;
+run it from the `backend` folder:
+
+```bash
+uv run python scripts/make_test_corpus.py ../test-documents
+```
+
+Files named `*-ilegivel.pdf` are deliberately unreadable scans: the app should warn
+"texto pode conter erros" for them.
+
 Useful addresses:
 
 | What | Where |
@@ -50,7 +62,9 @@ To stop: `Ctrl+C`, then `docker compose down`. To also erase all local data:
 
 ## Development without Docker (for developers)
 
-Backend (Python 3.12+, [uv](https://docs.astral.sh/uv/)), from `backend/`:
+Backend (Python 3.12+, [uv](https://docs.astral.sh/uv/), and Tesseract OCR with the
+Portuguese model: `apt install tesseract-ocr tesseract-ocr-por` or
+`brew install tesseract tesseract-lang`), from `backend/`:
 
 ```bash
 uv sync
