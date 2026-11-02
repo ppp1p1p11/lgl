@@ -11,6 +11,7 @@ from legalos.core.logging import configure_logging
 from legalos.core.middleware import origin_check, security_headers_and_logging
 from legalos.documents.router import router as documents_router
 from legalos.matters.router import router as matters_router
+from legalos.storage.router import router as storage_router
 from legalos.tenancy.router import router as firm_router
 
 
@@ -33,6 +34,7 @@ def create_app() -> FastAPI:
     app.include_router(audit_router)
     app.include_router(matters_router)
     app.include_router(documents_router)
+    app.include_router(storage_router)
 
     @app.get("/api/health", tags=["system"])
     def health(db: DbSession) -> dict[str, str]:

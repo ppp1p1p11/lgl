@@ -14,6 +14,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  experimental: {
+    // Without Docker, uploads go through this proxy to the API (local storage mode).
+    // Allow the 50 MB upload limit plus margin; in production files go straight to S3.
+    proxyClientMaxBodySize: "55mb",
+  },
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${apiUrl}/api/:path*` }];
   },

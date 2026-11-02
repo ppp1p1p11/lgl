@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 import pytest
 from pydantic import SecretStr
 
-from legalos.storage.s3 import (
+from legalos.storage.files import (
     StorageAccessError,
     object_key,
     signed_download_url,

@@ -1,12 +1,10 @@
-"""Object storage for firm files (S3-compatible: SeaweedFS locally, a Brazilian region in prod).
+"""S3-compatible storage backend (SeaweedFS in Docker, a Brazilian AWS region in prod).
 
-Every object key starts with `tenants/<tenant_id>/`, and signed URLs are only issued for
-keys under the caller's own prefix. The bucket itself is private; files are only reachable
-through short-lived signed URLs.
+Use `legalos.storage.files`, which checks that keys belong to the caller's firm before
+delegating here. The bucket is private; files are only reachable through short-lived
+signed URLs.
 """
 
-import re
-import uuid
 from functools import lru_cache
 from typing import TYPE_CHECKING
 from urllib.parse import quote
@@ -19,31 +17,6 @@ from legalos.config import get_settings
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
-
-_SAFE_PART = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,200}$")
-
-
-class StorageAccessError(Exception):
-    """Raised when a key does not belong to the requesting firm."""
-
-
-def tenant_prefix(tenant_id: uuid.UUID) -> str:
-    return f"tenants/{tenant_id}/"
-
-
-def object_key(tenant_id: uuid.UUID, *parts: str) -> str:
-    """Build a key under the firm's prefix. Parts must be simple names (no '/', no '..')."""
-    if not parts:
-        raise ValueError("At least one key part is required")
-    for part in parts:
-        if not _SAFE_PART.match(part) or ".." in part:
-            raise ValueError(f"Unsafe key part: {part!r}")
-    return tenant_prefix(tenant_id) + "/".join(parts)
-
-
-def ensure_tenant_key(tenant_id: uuid.UUID, key: str) -> None:
-    if not key.startswith(tenant_prefix(tenant_id)) or ".." in key:
-        raise StorageAccessError("Key does not belong to this firm")
 
 
 @lru_cache
@@ -64,8 +37,7 @@ def _client(public: bool) -> "S3Client":
     )
 
 
-def signed_upload_url(tenant_id: uuid.UUID, key: str, content_type: str) -> str:
-    ensure_tenant_key(tenant_id, key)
+def signed_upload_url(key: str, content_type: str) -> str:
     settings = get_settings()
     params: dict[str, str] = {
         "Bucket": settings.storage_bucket,
@@ -80,14 +52,12 @@ def signed_upload_url(tenant_id: uuid.UUID, key: str, content_type: str) -> str:
 
 
 def signed_download_url(
-    tenant_id: uuid.UUID,
     key: str,
     *,
     content_type: str | None = None,
     filename: str | None = None,
 ) -> str:
     """Short-lived link to view a file inline in the browser."""
-    ensure_tenant_key(tenant_id, key)
     settings = get_settings()
     params = {"Bucket": settings.storage_bucket, "Key": key}
     if content_type:
@@ -101,9 +71,8 @@ def signed_download_url(
     )
 
 
-def object_size(tenant_id: uuid.UUID, key: str) -> int | None:
+def object_size(key: str) -> int | None:
     """Size of a stored object in bytes, or None if it does not exist."""
-    ensure_tenant_key(tenant_id, key)
     try:
         head = _client(public=False).head_object(Bucket=get_settings().storage_bucket, Key=key)
     except ClientError as e:
@@ -113,14 +82,12 @@ def object_size(tenant_id: uuid.UUID, key: str) -> int | None:
     return int(head["ContentLength"])
 
 
-def delete_object(tenant_id: uuid.UUID, key: str) -> None:
-    ensure_tenant_key(tenant_id, key)
+def delete_object(key: str) -> None:
     _client(public=False).delete_object(Bucket=get_settings().storage_bucket, Key=key)
 
 
-def put_bytes(tenant_id: uuid.UUID, key: str, data: bytes, content_type: str) -> None:
+def put_bytes(key: str, data: bytes, content_type: str) -> None:
     """Server-side upload (used by the worker, e.g. for OCR output)."""
-    ensure_tenant_key(tenant_id, key)
     settings = get_settings()
     client = _client(public=False)
     if settings.storage_sse:
@@ -137,7 +104,6 @@ def put_bytes(tenant_id: uuid.UUID, key: str, data: bytes, content_type: str) ->
         )
 
 
-def get_bytes(tenant_id: uuid.UUID, key: str) -> bytes:
-    ensure_tenant_key(tenant_id, key)
+def get_bytes(key: str) -> bytes:
     obj = _client(public=False).get_object(Bucket=get_settings().storage_bucket, Key=key)
     return obj["Body"].read()

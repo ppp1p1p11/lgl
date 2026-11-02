@@ -6,6 +6,7 @@ and public access blocked.
 """
 
 import time
+from pathlib import Path
 
 from botocore.exceptions import ClientError, EndpointConnectionError
 from botocore.exceptions import ConnectionClosedError as BotoConnectionClosedError
@@ -16,6 +17,10 @@ from legalos.storage.s3 import _client
 
 def main(wait_seconds: int = 60) -> None:
     settings = get_settings()
+    if settings.storage_backend == "local":
+        Path(settings.storage_local_dir).mkdir(parents=True, exist_ok=True)
+        print(f"Using local storage folder {settings.storage_local_dir}.")
+        return
     client = _client(public=False)
     deadline = time.monotonic() + wait_seconds
     # The storage container may still be starting.

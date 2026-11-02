@@ -14,7 +14,43 @@ upload documents (PDF, Word, photos), read their text (including scanned pages, 
 next to the original, and search inside a processo. Firm isolation is enforced by the
 database and covered by tests. AI features arrive in Phase 2b.
 
-## Run it on your computer
+## Run it on a Mac without Docker (simplest)
+
+1. Install [Homebrew](https://brew.sh) if you don't have it (one command, shown on that
+   page). Then open the **Terminal** app and install the programs LegalOS needs:
+
+   ```bash
+   brew install uv node pnpm tesseract tesseract-lang postgresql@17 pgvector
+   ```
+
+2. Get the code. If you don't have it yet:
+
+   ```bash
+   git clone https://github.com/ppp1p1p11/lgl.git
+   cd lgl
+   ```
+
+   If the repository is private, Terminal will ask you to sign in to GitHub; using the
+   [GitHub Desktop](https://desktop.github.com) app to clone it is the easiest option.
+   Until the pull request is merged, also run `git checkout claude/youthful-allen-5sm5rq`.
+
+3. Start everything:
+
+   ```bash
+   ./run-local.sh
+   ```
+
+   The first run takes a few minutes. It creates a private database and a settings file
+   inside the project's `.local/` folder, adds the fictional firms, and creates fictional
+   documents in `test-documents/`. Then it opens **http://localhost:3000** in your
+   browser and shows the login details. Press **Ctrl+C** in the Terminal to stop.
+
+   To erase all local data and start over: `./run-local.sh reset`.
+
+   If something is missing, the script says exactly what to install. If it stops with
+   an error, the details are in `.local/logs/`.
+
+## Run it with Docker
 
 You need [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and
 running.

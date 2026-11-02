@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from legalos.audit.models import AuditEvent
 from legalos.documents.models import DocumentChunk, DocumentPage
 from legalos.jobs.queue import run_one
-from legalos.storage import s3
+from legalos.storage import files
 from legalos.tenancy.roles import Role
 from tests.conftest import login_with_mfa
 from tests.corpus.generator import build_corpus, render_docx, render_pdf, render_scan
@@ -35,30 +35,30 @@ def storage(monkeypatch: pytest.MonkeyPatch) -> FakeStorage:
     fake = FakeStorage()
 
     def upload_url(tenant_id, key, content_type):  # type: ignore[no-untyped-def]
-        s3.ensure_tenant_key(tenant_id, key)
+        files.ensure_tenant_key(tenant_id, key)
         return f"http://fake-storage/{key}"
 
     def download_url(tenant_id, key, **kwargs):  # type: ignore[no-untyped-def]
-        s3.ensure_tenant_key(tenant_id, key)
+        files.ensure_tenant_key(tenant_id, key)
         return f"http://fake-storage/{key}?download"
 
     def size(tenant_id, key):  # type: ignore[no-untyped-def]
-        s3.ensure_tenant_key(tenant_id, key)
+        files.ensure_tenant_key(tenant_id, key)
         return len(fake.objects[key]) if key in fake.objects else None
 
     def get(tenant_id, key):  # type: ignore[no-untyped-def]
-        s3.ensure_tenant_key(tenant_id, key)
+        files.ensure_tenant_key(tenant_id, key)
         return fake.objects[key]
 
     def delete(tenant_id, key):  # type: ignore[no-untyped-def]
-        s3.ensure_tenant_key(tenant_id, key)
+        files.ensure_tenant_key(tenant_id, key)
         fake.objects.pop(key, None)
 
-    monkeypatch.setattr(s3, "signed_upload_url", upload_url)
-    monkeypatch.setattr(s3, "signed_download_url", download_url)
-    monkeypatch.setattr(s3, "object_size", size)
-    monkeypatch.setattr(s3, "get_bytes", get)
-    monkeypatch.setattr(s3, "delete_object", delete)
+    monkeypatch.setattr(files, "signed_upload_url", upload_url)
+    monkeypatch.setattr(files, "signed_download_url", download_url)
+    monkeypatch.setattr(files, "object_size", size)
+    monkeypatch.setattr(files, "get_bytes", get)
+    monkeypatch.setattr(files, "delete_object", delete)
     return fake
 
 
@@ -282,7 +282,7 @@ def test_storage_errors_are_retried_then_marked_failed(
     def broken(tenant_id, key):  # type: ignore[no-untyped-def]
         raise ConnectionError("storage down")
 
-    monkeypatch.setattr(s3, "get_bytes", broken)
+    monkeypatch.setattr(files, "get_bytes", broken)
     for _ in range(3):
         run_worker()
         with Session(owner_engine) as db, db.begin():

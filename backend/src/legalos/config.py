@@ -38,7 +38,10 @@ class Settings(BaseSettings):
     login_window_minutes: int = 15
     mfa_max_failures: int = 5
 
-    # S3-compatible object storage (SeaweedFS locally, a Brazilian region in production).
+    # "s3": S3-compatible storage (SeaweedFS in Docker, a Brazilian region in production).
+    # "local": a folder on disk, for running on a laptop without Docker (never production).
+    storage_backend: Literal["s3", "local"] = "s3"
+    storage_local_dir: str = ".local/storage"
     storage_endpoint_url: str | None = "http://localhost:8333"
     storage_public_endpoint_url: str | None = None
     storage_region: str = "sa-east-1"

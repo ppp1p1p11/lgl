@@ -25,7 +25,7 @@ from legalos.documents.models import Document, DocumentChunk, DocumentPage, Docu
 from legalos.jobs.models import Job
 from legalos.jobs.queue import enqueue, handler
 from legalos.matters.service import add_event
-from legalos.storage import s3
+from legalos.storage import files
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ def _new_version(
         or 0
     ) + 1
     version_id = uuid.uuid4()
-    key = s3.object_key(tenant_id, "documents", str(document.id), str(version_id))
+    key = files.object_key(tenant_id, "documents", str(document.id), str(version_id))
     db.add(
         DocumentVersion(
             id=version_id,
@@ -94,7 +94,7 @@ def _new_version(
     return UploadTicket(
         document_id=document.id,
         version_id=version_id,
-        upload_url=s3.signed_upload_url(tenant_id, key, content_type),
+        upload_url=files.signed_upload_url(tenant_id, key, content_type),
         content_type=content_type,
     )
 
@@ -158,11 +158,11 @@ def complete_upload(
     PUT URL cannot limit size by itself)."""
     if version.status != "pending_upload":
         raise DocumentError("upload_already_completed", 409)
-    size = s3.object_size(tenant_id, version.storage_key)
+    size = files.object_size(tenant_id, version.storage_key)
     if size is None:
         raise DocumentError("upload_not_found", 409)
     if size > MAX_UPLOAD_BYTES:
-        s3.delete_object(tenant_id, version.storage_key)
+        files.delete_object(tenant_id, version.storage_key)
         version.status, version.error_code = "rejected", "file_too_large"
         return
     version.size_bytes = size
@@ -211,14 +211,14 @@ def _process(db: Session, version: DocumentVersion) -> None:
     tenant_id = version.tenant_id
     version.status = "processing"
 
-    data = s3.get_bytes(tenant_id, version.storage_key)
+    data = files.get_bytes(tenant_id, version.storage_key)
     version.size_bytes = len(data)
     version.sha256 = hashlib.sha256(data).hexdigest()
     detected = filetypes.sniff(data)
     version.detected_type = detected
     if detected is None:
         # Not a file type we accept, whatever its name says. Do not keep it.
-        s3.delete_object(tenant_id, version.storage_key)
+        files.delete_object(tenant_id, version.storage_key)
         _finish(db, version, status="rejected", error_code="unsupported_type")
         return
 
@@ -346,7 +346,7 @@ def file_url(
         ip=ip,
     )
     content_type = filetypes.CONTENT_TYPES.get(version.detected_type or "", None)
-    return s3.signed_download_url(
+    return files.signed_download_url(
         tenant_id,
         version.storage_key,
         content_type=content_type or version.declared_content_type,
