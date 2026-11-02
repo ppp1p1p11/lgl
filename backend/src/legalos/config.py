@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     storage_sse: str | None = None
     signed_url_ttl_seconds: int = 300
 
+    # AI gateway. "auto": Anthropic if ANTHROPIC_API_KEY is set, otherwise the simulated
+    # demo AI (never in production, where AI is then disabled).
+    ai_provider: Literal["auto", "anthropic", "demo", "disabled"] = "auto"
+    ai_model: str = "claude-opus-5-5"
+
     log_level: str = "INFO"
 
     # Worker

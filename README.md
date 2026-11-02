@@ -9,10 +9,17 @@ propose deadlines. A lawyer approves every consequential output.
   [`docs/phase-0-plan.md`](docs/phase-0-plan.md))
 - Conventions for AI-assisted development: [`CLAUDE.md`](CLAUDE.md)
 
-**Status:** Phase 2a is done. You can log in with MFA, register clients and processos,
+**Status:** Phase 2b is done. You can log in with MFA, register clients and processos,
 upload documents (PDF, Word, photos), read their text (including scanned pages, via OCR)
-next to the original, and search inside a processo. Firm isolation is enforced by the
-database and covered by tests. AI features arrive in Phase 2b.
+next to the original, and search inside a processo. On each document, **"Analisar com
+IA"** suggests the document type, extracts facts with the exact passage they come from,
+and writes a cited summary; a lawyer reviews and approves a specific version. Firm
+isolation is enforced by the database and covered by tests.
+
+**AI modes:** without an Anthropic API key, the app uses a *simulated* AI (simple rules,
+clearly labelled "IA simulada") so you can try the whole flow. With `ANTHROPIC_API_KEY`
+set, it uses Claude. Use only fictional or public documents for now: real client data
+needs a lawyer's review of the data-transfer rules first.
 
 ## Run it on a Mac without Docker (simplest)
 
@@ -46,6 +53,14 @@ database and covered by tests. AI features arrive in Phase 2b.
    browser and shows the login details. Press **Ctrl+C** in the Terminal to stop.
 
    To erase all local data and start over: `./run-local.sh reset`.
+
+   To use the real AI instead of the simulated one, add your key once (it stays only on
+   your computer, in `.local/env`) and restart:
+
+   ```bash
+   echo 'export ANTHROPIC_API_KEY="sua-chave"' >> .local/env
+   ./run-local.sh
+   ```
 
    If something is missing, the script says exactly what to install. If it stops with
    an error, the details are in `.local/logs/`.

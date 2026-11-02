@@ -31,6 +31,8 @@ class Document(TimestampMixin, Base):
     matter_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     title: Mapped[str] = mapped_column(String(300))
     doc_class: Mapped[str | None] = mapped_column(String(50))
+    # "ai" (suggested by classification) or "user" (set by a person; AI won't overwrite it).
+    doc_class_source: Mapped[str | None] = mapped_column(String(10))
     current_version_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid)
 

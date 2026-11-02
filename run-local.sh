@@ -191,10 +191,19 @@ done
 curl -sf "http://localhost:$WEB_PORT/api/health" >/dev/null 2>&1 ||
   fail "o sistema não respondeu. Veja os registros em .local/logs/ (api.log, worker.log, web.log)."
 
+if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+  ai_mode="IA real (Claude, da Anthropic)"
+else
+  ai_mode="IA simulada (demonstração). Para usar a IA real, rode:
+               echo 'export ANTHROPIC_API_KEY=\"sua-chave\"' >> .local/env
+               e reinicie com ./run-local.sh"
+fi
+
 cat <<EOF
 
 ────────────────────────────────────────────────────────────
   LegalOS está rodando em  http://localhost:$WEB_PORT
+  Modo de IA:  $ai_mode
 
   Entre com:   bruno.costa@silva.example
   Senha:       senha-de-teste-123

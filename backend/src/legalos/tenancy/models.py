@@ -1,6 +1,7 @@
 import uuid
+from decimal import Decimal
 
-from sqlalchemy import Enum, ForeignKey, String, Uuid
+from sqlalchemy import Boolean, Enum, ForeignKey, Numeric, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from legalos.core.db import Base, TimestampMixin
@@ -15,6 +16,9 @@ class Tenant(TimestampMixin, Base):
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(200))
     slug: Mapped[str] = mapped_column(String(100), unique=True)
+    # AI policy, set by a sócio.
+    ai_monthly_budget_usd: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal(50))
+    ai_redaction_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class Membership(TimestampMixin, Base):

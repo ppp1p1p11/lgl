@@ -5,102 +5,17 @@ import time
 import uuid
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from legalos.audit.models import AuditEvent
 from legalos.documents.models import DocumentChunk, DocumentPage
-from legalos.jobs.queue import run_one
 from legalos.storage import files
-from legalos.tenancy.roles import Role
-from tests.conftest import login_with_mfa
+from tests.conftest import login_with_mfa, run_worker, upload
 from tests.corpus.generator import build_corpus, render_docx, render_pdf, render_scan
 
 PDF = "application/pdf"
 DOCS = build_corpus()
-
-
-class FakeStorage:
-    def __init__(self) -> None:
-        self.objects: dict[str, bytes] = {}
-
-    def put_via_signed_url(self, url: str, data: bytes) -> None:
-        key = url.split("fake-storage/", 1)[1]
-        self.objects[key] = data
-
-
-@pytest.fixture
-def storage(monkeypatch: pytest.MonkeyPatch) -> FakeStorage:
-    fake = FakeStorage()
-
-    def upload_url(tenant_id, key, content_type):  # type: ignore[no-untyped-def]
-        files.ensure_tenant_key(tenant_id, key)
-        return f"http://fake-storage/{key}"
-
-    def download_url(tenant_id, key, **kwargs):  # type: ignore[no-untyped-def]
-        files.ensure_tenant_key(tenant_id, key)
-        return f"http://fake-storage/{key}?download"
-
-    def size(tenant_id, key):  # type: ignore[no-untyped-def]
-        files.ensure_tenant_key(tenant_id, key)
-        return len(fake.objects[key]) if key in fake.objects else None
-
-    def get(tenant_id, key):  # type: ignore[no-untyped-def]
-        files.ensure_tenant_key(tenant_id, key)
-        return fake.objects[key]
-
-    def delete(tenant_id, key):  # type: ignore[no-untyped-def]
-        files.ensure_tenant_key(tenant_id, key)
-        fake.objects.pop(key, None)
-
-    monkeypatch.setattr(files, "signed_upload_url", upload_url)
-    monkeypatch.setattr(files, "signed_download_url", download_url)
-    monkeypatch.setattr(files, "object_size", size)
-    monkeypatch.setattr(files, "get_bytes", get)
-    monkeypatch.setattr(files, "delete_object", delete)
-    return fake
-
-
-@pytest.fixture
-def matter(client: TestClient, make_firm, make_member) -> dict:
-    m = make_member(make_firm("Alfa"), Role.ADVOGADO)
-    login_with_mfa(client, m.email)
-    c = client.post("/api/clients", json={"kind": "PF", "name": "Cliente"}).json()
-    return client.post(
-        "/api/matters", json={"client_id": c["id"], "title": "Ação de cobrança", "area": "civel"}
-    ).json()
-
-
-def upload(
-    client: TestClient,
-    storage: FakeStorage,
-    matter_id: str,
-    data: bytes,
-    filename: str = "doc.pdf",
-    content_type: str = PDF,
-    title: str | None = None,
-) -> dict:
-    r = client.post(
-        f"/api/matters/{matter_id}/documents",
-        json={
-            "filename": filename,
-            "content_type": content_type,
-            "size_bytes": len(data),
-            "title": title,
-        },
-    )
-    assert r.status_code == 201, r.text
-    ticket = r.json()
-    storage.put_via_signed_url(ticket["upload_url"], data)
-    r = client.post(f"/api/document-versions/{ticket['version_id']}/complete")
-    assert r.status_code == 200, r.text
-    return ticket
-
-
-def run_worker() -> None:
-    while run_one("test-worker"):
-        pass
 
 
 def test_upload_process_read_and_search(client, storage, matter, owner_engine: Engine) -> None:

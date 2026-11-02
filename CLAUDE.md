@@ -10,9 +10,12 @@ for scope and rules).
 - Phase 1 (foundations) — done. Auth + MFA, roles, tenants with RLS, audit log, job
   queue, object storage, CI, seed data.
 - Phase 2 plan approved 2026-10-29 (`docs/phase-2-plan.md`), split into 2a and 2b.
-- **Phase 2a (matters + documents, no AI) — done, awaiting founder review.** Clients,
-  processos, parties, team, timeline, uploads, text extraction/OCR, search, viewer.
-- Next: Phase 2b (AI on documents). Needs `ANTHROPIC_API_KEY` in the environment.
+- Phase 2a (matters + documents, no AI) — done (PR ppp1p1p11/lgl#1).
+- **Phase 2b (AI on documents) — done, awaiting founder review.** AI gateway, document
+  type, facts with verified quotes, cited summary, review/approval, demo AI, `run-local.sh`.
+  Not yet run against the real model (no API key in this environment): VERIFY AI-6.
+- AI runs on Anthropic's API (no Brazil region): only synthetic/public documents until a
+  lawyer approves the international-transfer setup (VERIFY REG-2).
 - Test documents: synthetic, or public sources whose terms were checked. Never collect
   law firms' documents. No real client data until a lawyer reviews LGPD basics.
 
@@ -97,17 +100,26 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
   hash); return masked except in audited detail views.
 - Uploaded files are untrusted: detect type from content (`documents.filetypes`), parse
   only in the worker, keep the limits in `documents.extraction`.
+- AI: call only `legalos.gateway.service.call` (a test forbids importing `anthropic`
+  elsewhere). Document text goes in `DocumentInput` blocks, never in instructions. Every
+  quote/citation must pass `ai.verify.locate`; unverifiable content is dropped or flagged.
+  AI outputs are immutable versions; changes create a new version that needs approval.
+- Tests use a scripted provider (`monkeypatch.setattr(gateway, "get_provider", ...)`);
+  without `ANTHROPIC_API_KEY` the app uses the rule-based demo provider (never in
+  production).
 
 ## Commands
 
 | Task | Command |
 |---|---|
-| Whole stack locally | `cp .env.example .env && docker compose up --build` |
+| Whole stack on a Mac/Linux without Docker | `./run-local.sh` (`./run-local.sh reset` wipes `.local/`) |
+| Whole stack locally with Docker | `cp .env.example .env && docker compose up --build` |
 | Seed fictional firms | `docker compose run --rm api python -m legalos.seed` |
 | Backend tests | `cd backend && uv run pytest` (needs Postgres+pgvector; `LEGALOS_TEST_ADMIN_URL`, default `postgresql://postgres:postgres@localhost:5432/postgres`) |
 | Storage integration test | set `LEGALOS_TEST_S3_ENDPOINT=http://localhost:8333` with SeaweedFS running |
 | OCR accuracy report | `cd backend && uv run python scripts/ocr_eval.py` (needs `tesseract` + `tesseract-ocr-por`) |
 | Synthetic test documents | `cd backend && uv run python scripts/make_test_corpus.py ../test-documents` |
+| Live AI evaluation (paid) | `cd backend && ANTHROPIC_API_KEY=... uv run python scripts/ai_eval.py --yes` |
 | Backend lint/format/types | `uv run ruff check . && uv run ruff format --check . && uv run mypy` |
 | New migration | add a file in `backend/alembic/versions/` (SQL via `op.execute`) |
 | Frontend | `cd frontend && pnpm lint && pnpm typecheck && pnpm test && pnpm build` |

@@ -371,3 +371,81 @@ mark {
   font-family: inherit;
   margin: 8px 0 0;
 }
+
+/* --- Phase 2b: AI analysis --- */
+
+.ai-panel h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.ai-output {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.summary-heading {
+  margin: 12px 0 4px;
+}
+
+.segment {
+  white-space: pre-line;
+  margin: 4px 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.segment.unverified {
+  text-decoration: underline wavy var(--danger);
+  text-underline-offset: 3px;
+}
+
+.segment.selected,
+tr.selected td {
+  background: #fdecea;
+  text-decoration: line-through;
+}
+
+.badge.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.badge.ai-aprovado {
+  border-color: #2e7d32;
+  color: #2e7d32;
+}
+
+.badge.ai-rejeitado {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+button.cite {
+  font-size: 0.75rem;
+  padding: 0 6px;
+  margin-left: 4px;
+  background: var(--surface);
+  color: var(--accent);
+}
+
+mark.cited {
+  background: #ffe08a;
+  outline: 2px solid #f0b400;
+}
+
+.decision {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.decision input {
+  flex: 1 1 220px;
+}
+
+.approval {
+  color: #2e5d2e;
+}

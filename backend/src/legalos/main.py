@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from legalos.ai.router import router as ai_router
 from legalos.audit.router import router as audit_router
 from legalos.auth.deps import DbSession
 from legalos.auth.router import router as auth_router
@@ -35,6 +36,7 @@ def create_app() -> FastAPI:
     app.include_router(matters_router)
     app.include_router(documents_router)
     app.include_router(storage_router)
+    app.include_router(ai_router)
 
     @app.get("/api/health", tags=["system"])
     def health(db: DbSession) -> dict[str, str]:

@@ -59,17 +59,20 @@ implemented (migrations `0001`, `0002`); later sections are still the plan.
 | `document_chunks` | tenant_id, document_version_id, page_number, char_start, char_end, text, tsv (generated, `portuguese`), embedding (vector, filled from Phase 3) | Never crosses pages; `page.text[char_start:char_end] == text`. RLS applies to text and vector search |
 | `extracted_facts` | tenant_id, document_version_id, fact_type (date, value, party, pedido…), value, source_chunk_id, char_start, char_end, confidence | Every fact points to its exact span |
 
-### AI work, review, approval — Phases 2–4
+### AI work, review, approval — Phase 2b (implemented for document analysis)
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `agent_runs` | tenant_id, matter_id, workflow (summary, research, drafting, deadline), status, started_by, started_at, finished_at | The auditable trace |
-| `agent_steps` | tenant_id, agent_run_id, seq, kind (tool_call / model_call), tool_name, input_ref, output_ref, gateway_call_id | |
-| `ai_outputs` | tenant_id, matter_id, agent_run_id, kind (summary, research_answer, draft, task_proposal), status (`rascunho`, `em_revisao`, `aprovado`, `rejeitado`) | |
-| `ai_output_versions` | tenant_id, ai_output_id, version_no, content (structured), gaps ("fatos faltantes"), confidence, created_by (ai/user) | Immutable |
-| `citations` | tenant_id, ai_output_version_id, target_type (corpus / document), corpus_unit_version_id or document_chunk_id, quoted_text, char_start, char_end, verification (`verificado`, `nao_verificado`, `removido`), verifier_notes | Result of the citation verifier |
-| `approvals` | tenant_id, ai_output_version_id, approver_user_id, decision, comment, at | Rule 2 of the brief |
-| `gateway_calls` | tenant_id, purpose, provider, model, region, input_tokens, output_tokens, cost_brl, latency_ms, redaction_count, prompt_stored (bool) | No raw prompt by default |
+| `ai_runs` | tenant_id, matter_id, document_version_id, workflow (`document_analysis`; later research, drafting, deadlines), status (queued / running / succeeded / failed), error_code, started_by | The auditable trace of each AI workflow, linked to the matter |
+| `gateway_calls` | tenant_id, ai_run_id, user_id, purpose, provider, model (the one that answered), status (ok / refused / truncated / error), input/output/cache tokens, cost_usd, latency_ms, redaction_count, request_id | Append-only. **No prompt or answer text** |
+| `ai_outputs` | tenant_id, matter_id, document_version_id, ai_run_id, kind (`facts`, `summary`; later research_answer, draft, task_proposal), status (`rascunho`, `em_revisao`, `aprovado`, `rejeitado`), current_version_no | |
+| `ai_output_versions` | tenant_id, ai_output_id, version_no, content (jsonb: facts or summary segments, discarded count, partial flag, provider), created_by_ai, created_by, note | Immutable; removing items creates a new version |
+| `ai_citations` | tenant_id, ai_output_version_id, item_index, document_version_id, page_number, char_start, char_end, quoted_text, verification (`verificado` / `nao_verificado`) | Positions point into `document_pages.text`. Corpus citations arrive in Phase 3 |
+| `ai_approvals` | tenant_id, ai_output_version_id, approver_user_id (must be a firm member), decision, comment, decided_at | Append-only. Rule 2 of the brief |
+
+Also: `tenants.ai_monthly_budget_usd` (default 50) and `tenants.ai_redaction_enabled`
+(default true); `documents.doc_class_source` (`ai` or `user`; the AI never overwrites a
+type set by a person).
 
 ### Drafting — Phase 4
 

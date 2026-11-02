@@ -31,9 +31,9 @@ not create empty scaffolding ahead of time.
 │   │   ├── jobs/                 # Postgres job queue
 │   │   ├── matters/              # clients, processos, parties, team, timeline
 │   │   ├── documents/            # upload, file types, extraction/OCR, chunking, search
-│   │   ├── gateway/              # AI gateway: providers, redaction, call log (Phase 2)
-│   │   ├── agents/               # orchestrators, scoped tools, traces     (Phase 2+)
-│   │   ├── citations/            # citation verifier                       (Phase 2+)
+│   │   ├── gateway/              # AI gateway: providers (Claude, demo), redaction, pricing, call log
+│   │   ├── ai/                   # document analysis workflows, verification, review   (2b)
+│   │   ├── agents/               # orchestrators with scoped tools          (Phase 3+)
 │   │   ├── corpus/               # ingestion per source, chunking, search  (Phase 3)
 │   │   ├── drafting/             # templates, generation, .docx export     (Phase 4)
 │   │   ├── deadlines/            # rule sets (cpc, clt, juizados), calendars (Phase 5)

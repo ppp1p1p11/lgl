@@ -1,6 +1,189 @@
 {
   "components": {
     "schemas": {
+      "AiSettingsIn": {
+        "properties": {
+          "monthly_budget_usd": {
+            "anyOf": [
+              {
+                "maximum": 100000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Budget Usd"
+          },
+          "redaction_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redaction Enabled"
+          }
+        },
+        "title": "AiSettingsIn",
+        "type": "object"
+      },
+      "AiUsageOut": {
+        "properties": {
+          "calls_this_month": {
+            "title": "Calls This Month",
+            "type": "integer"
+          },
+          "month_spend_usd": {
+            "title": "Month Spend Usd",
+            "type": "string"
+          },
+          "monthly_budget_usd": {
+            "title": "Monthly Budget Usd",
+            "type": "string"
+          },
+          "redaction_enabled": {
+            "title": "Redaction Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "month_spend_usd",
+          "monthly_budget_usd",
+          "redaction_enabled",
+          "calls_this_month"
+        ],
+        "title": "AiUsageOut",
+        "type": "object"
+      },
+      "AnalysisOut": {
+        "properties": {
+          "doc_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doc Class"
+          },
+          "doc_class_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "ai",
+                  "user"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doc Class Source"
+          },
+          "outputs": {
+            "items": {
+              "$ref": "#/components/schemas/OutputOut"
+            },
+            "title": "Outputs",
+            "type": "array"
+          },
+          "provider": {
+            "enum": [
+              "anthropic",
+              "demo",
+              "none"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "provider",
+          "doc_class",
+          "doc_class_source",
+          "run",
+          "outputs"
+        ],
+        "title": "AnalysisOut",
+        "type": "object"
+      },
+      "ApprovalOut": {
+        "properties": {
+          "approver_name": {
+            "title": "Approver Name",
+            "type": "string"
+          },
+          "approver_oab": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approver Oab"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "decided_at": {
+            "format": "date-time",
+            "title": "Decided At",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "aprovado",
+              "rejeitado"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "version_no": {
+            "title": "Version No",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version_no",
+          "decision",
+          "approver_name",
+          "approver_oab",
+          "comment",
+          "decided_at"
+        ],
+        "title": "ApprovalOut",
+        "type": "object"
+      },
       "AuditEventOut": {
         "properties": {
           "action": {
@@ -66,6 +249,69 @@
           "details"
         ],
         "title": "AuditEventOut",
+        "type": "object"
+      },
+      "CitationOut": {
+        "properties": {
+          "char_end": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Char End"
+          },
+          "char_start": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Char Start"
+          },
+          "item_index": {
+            "title": "Item Index",
+            "type": "integer"
+          },
+          "page_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Number"
+          },
+          "quoted_text": {
+            "title": "Quoted Text",
+            "type": "string"
+          },
+          "verification": {
+            "enum": [
+              "verificado",
+              "nao_verificado"
+            ],
+            "title": "Verification",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_index",
+          "page_number",
+          "char_start",
+          "char_end",
+          "quoted_text",
+          "verification"
+        ],
+        "title": "CitationOut",
         "type": "object"
       },
       "ClientIn": {
@@ -208,6 +454,40 @@
           "created_at"
         ],
         "title": "ClientOut",
+        "type": "object"
+      },
+      "DecisionIn": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "decision": {
+            "enum": [
+              "aprovado",
+              "rejeitado"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "version_no": {
+            "title": "Version No",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version_no",
+          "decision"
+        ],
+        "title": "DecisionIn",
         "type": "object"
       },
       "DocumentDetail": {
@@ -1093,6 +1373,84 @@
         "title": "MfaVerifyRequest",
         "type": "object"
       },
+      "OutputOut": {
+        "properties": {
+          "approvals": {
+            "items": {
+              "$ref": "#/components/schemas/ApprovalOut"
+            },
+            "title": "Approvals",
+            "type": "array"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/CitationOut"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "content": {
+            "additionalProperties": true,
+            "title": "Content",
+            "type": "object"
+          },
+          "created_by_ai": {
+            "title": "Created By Ai",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "facts",
+              "summary"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "status": {
+            "enum": [
+              "rascunho",
+              "em_revisao",
+              "aprovado",
+              "rejeitado"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "version_no": {
+            "title": "Version No",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "version_no",
+          "created_by_ai",
+          "note",
+          "content",
+          "citations",
+          "approvals"
+        ],
+        "title": "OutputOut",
+        "type": "object"
+      },
       "PageOut": {
         "properties": {
           "low_ocr_confidence": {
@@ -1285,6 +1643,41 @@
         "title": "Permission",
         "type": "string"
       },
+      "RemoveItemsIn": {
+        "properties": {
+          "base_version_no": {
+            "title": "Base Version No",
+            "type": "integer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "remove": {
+            "items": {
+              "type": "integer"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Remove",
+            "type": "array"
+          }
+        },
+        "required": [
+          "base_version_no",
+          "remove"
+        ],
+        "title": "RemoveItemsIn",
+        "type": "object"
+      },
       "Role": {
         "enum": [
           "socio",
@@ -1294,6 +1687,62 @@
         ],
         "title": "Role",
         "type": "string"
+      },
+      "RunOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "error_code",
+          "created_at",
+          "finished_at"
+        ],
+        "title": "RunOut",
+        "type": "object"
       },
       "SearchHitOut": {
         "properties": {
@@ -1610,6 +2059,19 @@
         "title": "VersionOut",
         "type": "object"
       },
+      "VersionRef": {
+        "properties": {
+          "version_no": {
+            "title": "Version No",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version_no"
+        ],
+        "title": "VersionRef",
+        "type": "object"
+      },
       "legalos__matters__router__MemberOut": {
         "properties": {
           "name": {
@@ -1674,6 +2136,165 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/ai-outputs/{output_id}/decision": {
+      "post": {
+        "operationId": "decide_api_ai_outputs__output_id__decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai-outputs/{output_id}/submit": {
+      "post": {
+        "operationId": "submit_api_ai_outputs__output_id__submit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionRef"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Submit",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/ai-outputs/{output_id}/versions": {
+      "post": {
+        "operationId": "remove_items_api_ai_outputs__output_id__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveItemsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Items",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
     "/api/audit-log": {
       "get": {
         "operationId": "list_audit_events_api_audit_log_get",
@@ -2065,6 +2686,90 @@
         ]
       }
     },
+    "/api/document-versions/{version_id}/analysis": {
+      "get": {
+        "operationId": "get_analysis_api_document_versions__version_id__analysis_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Analysis",
+        "tags": [
+          "ai"
+        ]
+      },
+      "post": {
+        "operationId": "start_analysis_api_document_versions__version_id__analysis_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Version Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Analysis",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
     "/api/document-versions/{version_id}/complete": {
       "post": {
         "operationId": "complete_upload_api_document_versions__version_id__complete_post",
@@ -2291,6 +2996,68 @@
         "summary": "Start New Version",
         "tags": [
           "documents"
+        ]
+      }
+    },
+    "/api/firm/ai-settings": {
+      "patch": {
+        "operationId": "update_ai_settings_api_firm_ai_settings_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiSettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Ai Settings",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/firm/ai-usage": {
+      "get": {
+        "operationId": "ai_usage_api_firm_ai_usage_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ai Usage",
+        "tags": [
+          "ai"
         ]
       }
     },

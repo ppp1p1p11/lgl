@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
+import { AiAnalysis, type Highlight } from "@/components/AiAnalysis";
 import { DocumentStatus, isPending } from "@/components/DocumentStatus";
 import { ErrorText } from "@/components/ErrorText";
 import { api } from "@/lib/api/client";
@@ -26,6 +27,8 @@ function Viewer() {
   const { id: matterId, docId } = useParams<{ id: string; docId: string }>();
   const initialPage = Number(useSearchParams().get("pagina") ?? "1");
   const canUpload = useCan("manage_documents");
+  const canSeeAi = useCan("view_ai_outputs");
+  const [highlight, setHighlight] = useState<Highlight | null>(null);
   const [doc, setDoc] = useState<DocumentDetail | null>(null);
   const [versionId, setVersionId] = useState<string | null>(null);
   const [pages, setPages] = useState<Page[]>([]);
@@ -77,6 +80,12 @@ function Viewer() {
     if (pages.length) pageRefs.current[initialPage]?.scrollIntoView({ block: "start" });
   }, [pages, initialPage]);
 
+  function showPassage(h: Highlight) {
+    setHighlight(h);
+    setPageNumber(h.page);
+    pageRefs.current[h.page]?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
   async function onNewVersion(files: FileList | null) {
     const selected = files?.[0];
     if (!selected) return;
@@ -127,6 +136,9 @@ function Viewer() {
       {ready && (
         <>
           {version?.low_ocr_confidence && <p className="warning">{t.documento.lowConfidence}</p>}
+          {canSeeAi && versionId && (
+            <AiAnalysis key={versionId} versionId={versionId} onHighlight={showPassage} />
+          )}
           <div className="side-by-side">
             <section className="pane">
               <h2>{t.documento.original}</h2>
@@ -149,7 +161,10 @@ function Viewer() {
                       ` · ${t.documento.confidence} ${Math.round(p.ocr_confidence)}%`}
                     {p.low_ocr_confidence && <span className="badge warn">OCR</span>}
                   </header>
-                  <pre>{p.text}</pre>
+                  <PageText
+                    text={p.text}
+                    highlight={highlight?.page === p.page_number ? highlight : null}
+                  />
                 </article>
               ))}
             </section>
@@ -157,6 +172,17 @@ function Viewer() {
         </>
       )}
     </>
+  );
+}
+
+function PageText({ text, highlight }: { text: string; highlight: Highlight | null }) {
+  if (!highlight) return <pre>{text}</pre>;
+  return (
+    <pre>
+      {text.slice(0, highlight.start)}
+      <mark className="cited">{text.slice(highlight.start, highlight.end)}</mark>
+      {text.slice(highlight.end)}
+    </pre>
   );
 }
 

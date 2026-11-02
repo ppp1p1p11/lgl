@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+  "/api/ai-outputs/{output_id}/decision": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Decide */
+    post: operations["decide_api_ai_outputs__output_id__decision_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/ai-outputs/{output_id}/submit": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Submit */
+    post: operations["submit_api_ai_outputs__output_id__submit_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/ai-outputs/{output_id}/versions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Remove Items */
+    post: operations["remove_items_api_ai_outputs__output_id__versions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/audit-log": {
     parameters: {
       query?: never;
@@ -175,6 +226,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/document-versions/{version_id}/analysis": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Analysis */
+    get: operations["get_analysis_api_document_versions__version_id__analysis_get"];
+    put?: never;
+    /** Start Analysis */
+    post: operations["start_analysis_api_document_versions__version_id__analysis_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/document-versions/{version_id}/complete": {
     parameters: {
       query?: never;
@@ -254,6 +323,40 @@ export interface paths {
     put?: never;
     /** Start New Version */
     post: operations["start_new_version_api_documents__document_id__versions_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/firm/ai-settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Ai Settings */
+    patch: operations["update_ai_settings_api_firm_ai_settings_patch"];
+    trace?: never;
+  };
+  "/api/firm/ai-usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Ai Usage */
+    get: operations["ai_usage_api_firm_ai_usage_get"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -437,6 +540,60 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AiSettingsIn */
+    AiSettingsIn: {
+      /** Monthly Budget Usd */
+      monthly_budget_usd?: number | string | null;
+      /** Redaction Enabled */
+      redaction_enabled?: boolean | null;
+    };
+    /** AiUsageOut */
+    AiUsageOut: {
+      /** Calls This Month */
+      calls_this_month: number;
+      /** Month Spend Usd */
+      month_spend_usd: string;
+      /** Monthly Budget Usd */
+      monthly_budget_usd: string;
+      /** Redaction Enabled */
+      redaction_enabled: boolean;
+    };
+    /** AnalysisOut */
+    AnalysisOut: {
+      /** Doc Class */
+      doc_class: string | null;
+      /** Doc Class Source */
+      doc_class_source: ("ai" | "user") | null;
+      /** Outputs */
+      outputs: components["schemas"]["OutputOut"][];
+      /**
+       * Provider
+       * @enum {string}
+       */
+      provider: "anthropic" | "demo" | "none";
+      run: components["schemas"]["RunOut"] | null;
+    };
+    /** ApprovalOut */
+    ApprovalOut: {
+      /** Approver Name */
+      approver_name: string;
+      /** Approver Oab */
+      approver_oab: string | null;
+      /** Comment */
+      comment: string | null;
+      /**
+       * Decided At
+       * Format: date-time
+       */
+      decided_at: string;
+      /**
+       * Decision
+       * @enum {string}
+       */
+      decision: "aprovado" | "rejeitado";
+      /** Version No */
+      version_no: number;
+    };
     /** AuditEventOut */
     AuditEventOut: {
       /** Action */
@@ -458,6 +615,24 @@ export interface components {
        * Format: date-time
        */
       occurred_at: string;
+    };
+    /** CitationOut */
+    CitationOut: {
+      /** Char End */
+      char_end: number | null;
+      /** Char Start */
+      char_start: number | null;
+      /** Item Index */
+      item_index: number;
+      /** Page Number */
+      page_number: number | null;
+      /** Quoted Text */
+      quoted_text: string;
+      /**
+       * Verification
+       * @enum {string}
+       */
+      verification: "verificado" | "nao_verificado";
     };
     /** ClientIn */
     ClientIn: {
@@ -502,6 +677,18 @@ export interface components {
       name: string;
       /** Phone */
       phone: string | null;
+    };
+    /** DecisionIn */
+    DecisionIn: {
+      /** Comment */
+      comment?: string | null;
+      /**
+       * Decision
+       * @enum {string}
+       */
+      decision: "aprovado" | "rejeitado";
+      /** Version No */
+      version_no: number;
     };
     /** DocumentDetail */
     DocumentDetail: {
@@ -830,6 +1017,38 @@ export interface components {
       /** Recovery Code */
       recovery_code?: string | null;
     };
+    /** OutputOut */
+    OutputOut: {
+      /** Approvals */
+      approvals: components["schemas"]["ApprovalOut"][];
+      /** Citations */
+      citations: components["schemas"]["CitationOut"][];
+      /** Content */
+      content: {
+        [key: string]: unknown;
+      };
+      /** Created By Ai */
+      created_by_ai: boolean;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: "facts" | "summary";
+      /** Note */
+      note: string | null;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "rascunho" | "em_revisao" | "aprovado" | "rejeitado";
+      /** Version No */
+      version_no: number;
+    };
     /** PageOut */
     PageOut: {
       /** Low Ocr Confidence */
@@ -919,11 +1138,42 @@ export interface components {
       | "draft_ai_outputs"
       | "approve_ai_outputs"
       | "confirm_deadlines";
+    /** RemoveItemsIn */
+    RemoveItemsIn: {
+      /** Base Version No */
+      base_version_no: number;
+      /** Note */
+      note?: string | null;
+      /** Remove */
+      remove: number[];
+    };
     /**
      * Role
      * @enum {string}
      */
     Role: "socio" | "advogado" | "estagiario" | "administrativo";
+    /** RunOut */
+    RunOut: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Error Code */
+      error_code: string | null;
+      /** Finished At */
+      finished_at: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "queued" | "running" | "succeeded" | "failed";
+    };
     /** SearchHitOut */
     SearchHitOut: {
       /**
@@ -1042,6 +1292,11 @@ export interface components {
       /** Version No */
       version_no: number;
     };
+    /** VersionRef */
+    VersionRef: {
+      /** Version No */
+      version_no: number;
+    };
     /** MemberOut */
     legalos__matters__router__MemberOut: {
       /** Name */
@@ -1079,6 +1334,111 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  decide_api_ai_outputs__output_id__decision_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        output_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DecisionIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutputOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  submit_api_ai_outputs__output_id__submit_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        output_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VersionRef"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutputOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  remove_items_api_ai_outputs__output_id__versions_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        output_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RemoveItemsIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutputOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   list_audit_events_api_audit_log_get: {
     parameters: {
       query?: {
@@ -1391,6 +1751,68 @@ export interface operations {
       };
     };
   };
+  get_analysis_api_document_versions__version_id__analysis_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        version_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AnalysisOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  start_analysis_api_document_versions__version_id__analysis_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        version_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RunOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   complete_upload_api_document_versions__version_id__complete_post: {
     parameters: {
       query?: never;
@@ -1546,6 +1968,59 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_ai_settings_api_firm_ai_settings_patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AiSettingsIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AiUsageOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  ai_usage_api_firm_ai_usage_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AiUsageOut"];
         };
       };
     };
