@@ -265,13 +265,19 @@ def _confirmed_factor(db: Session, user_id: uuid.UUID) -> MfaFactor | None:
 def start_mfa_setup(db: Session, principal: Principal) -> MfaSetup:
     if _confirmed_factor(db, principal.user_id) is not None:
         raise AuthError(AuthErrorCode.MFA_ALREADY_CONFIGURED, 409)
-    db.execute(
-        delete(MfaFactor).where(
-            MfaFactor.user_id == principal.user_id, MfaFactor.confirmed_at.is_(None)
-        )
+    # Repeated calls (page reload, or React running effects twice) return the pending
+    # secret instead of replacing it, so the QR code the user scanned stays valid.
+    pending = db.scalar(
+        select(MfaFactor)
+        .where(MfaFactor.user_id == principal.user_id, MfaFactor.confirmed_at.is_(None))
+        .order_by(MfaFactor.created_at.desc())
+        .limit(1)
     )
-    secret = pyotp.random_base32()
-    db.add(MfaFactor(user_id=principal.user_id, secret_encrypted=crypto.encrypt(secret)))
+    if pending is not None:
+        secret = crypto.decrypt(pending.secret_encrypted)
+    else:
+        secret = pyotp.random_base32()
+        db.add(MfaFactor(user_id=principal.user_id, secret_encrypted=crypto.encrypt(secret)))
     email = db.scalar(select(User.email).where(User.id == principal.user_id)) or ""
     uri = pyotp.TOTP(secret).provisioning_uri(name=email, issuer_name=TOTP_ISSUER)
     return MfaSetup(secret=secret, otpauth_uri=uri)
@@ -325,17 +331,25 @@ def confirm_mfa_setup(db: Session, principal: Principal, code: str, *, ip: str |
     shown to the user only once."""
     if _confirmed_factor(db, principal.user_id) is not None:
         raise AuthError(AuthErrorCode.MFA_ALREADY_CONFIGURED, 409)
-    factor = db.scalar(
-        select(MfaFactor).where(
-            MfaFactor.user_id == principal.user_id, MfaFactor.confirmed_at.is_(None)
+    pending = list(
+        db.scalars(
+            select(MfaFactor).where(
+                MfaFactor.user_id == principal.user_id, MfaFactor.confirmed_at.is_(None)
+            )
         )
     )
-    if factor is None:
+    if not pending:
         raise AuthError(AuthErrorCode.MFA_SETUP_NOT_STARTED, 409)
-    step = _match_totp(factor, code)
-    if step is None:
+    # Two setup requests racing can leave two pending secrets; accept the one the user
+    # actually scanned and discard the other.
+    matched = [(f, step) for f in pending if (step := _match_totp(f, code)) is not None]
+    if not matched:
         _register_mfa_failure(principal, ip=ip)
         raise AuthError(AuthErrorCode.INVALID_MFA_CODE, 401)
+    factor, step = matched[0]
+    for other in pending:
+        if other is not factor:
+            db.delete(other)
     factor.confirmed_at = _now()
     factor.last_used_step = step
     codes = _new_recovery_codes(db, principal.user_id)

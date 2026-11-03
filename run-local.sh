@@ -166,9 +166,12 @@ if [ ! -d "$ROOT/test-documents" ]; then
   step uv run python scripts/make_test_corpus.py "$ROOT/test-documents"
 fi
 
-say "Preparando o frontend"
+say "Preparando o frontend (leva cerca de um minuto)"
 cd "$ROOT/frontend"
 step pnpm install --frozen-lockfile
+# Production build: faster pages and the same behaviour as the real deployment. The API
+# address is fixed at build time, so the build runs on every start.
+step env API_INTERNAL_URL="http://localhost:$API_PORT" pnpm build
 
 # --- 4. Start the API, the worker and the web app -------------------------------------
 
@@ -180,7 +183,7 @@ PIDS="$PIDS $!"
 uv run --quiet python -m legalos.worker >"$LOCAL/logs/worker.log" 2>&1 &
 PIDS="$PIDS $!"
 cd "$ROOT/frontend"
-API_INTERNAL_URL="http://localhost:$API_PORT" PORT="$WEB_PORT" pnpm dev >"$LOCAL/logs/web.log" 2>&1 &
+PORT="$WEB_PORT" pnpm start >"$LOCAL/logs/web.log" 2>&1 &
 PIDS="$PIDS $!"
 set +m
 

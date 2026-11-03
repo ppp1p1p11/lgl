@@ -203,3 +203,38 @@ def test_mfa_verify_requires_a_code(client: TestClient, make_firm, make_member) 
     client.post("/api/auth/logout")
     client.post("/api/auth/login", json={"email": m.email, "password": PASSWORD})
     assert client.post("/api/auth/mfa/verify", json={}).status_code == 401
+
+
+def test_repeated_mfa_setup_keeps_the_same_secret(
+    client: TestClient, make_firm, make_member
+) -> None:
+    """React runs effects twice in development; the QR code must stay valid."""
+    m = make_member(make_firm("Alfa"))
+    client.post("/api/auth/login", json={"email": m.email, "password": PASSWORD})
+    first = client.post("/api/auth/mfa/setup").json()["secret"]
+    second = client.post("/api/auth/mfa/setup").json()["secret"]
+    assert first == second
+    r = client.post("/api/auth/mfa/confirm", json={"code": totp_now(first)})
+    assert r.status_code == 200
+
+
+def test_confirm_accepts_either_secret_after_a_setup_race(
+    client: TestClient, make_firm, make_member, owner_engine
+) -> None:
+    import pyotp
+
+    from legalos.auth.models import MfaFactor
+    from legalos.core import crypto
+
+    m = make_member(make_firm("Alfa"))
+    client.post("/api/auth/login", json={"email": m.email, "password": PASSWORD})
+    client.post("/api/auth/mfa/setup")
+    # Simulate a second, concurrent setup request that inserted another pending secret.
+    other_secret = pyotp.random_base32()
+    with Session(owner_engine) as db, db.begin():
+        db.add(MfaFactor(user_id=m.user_id, secret_encrypted=crypto.encrypt(other_secret)))
+    r = client.post("/api/auth/mfa/confirm", json={"code": totp_now(other_secret)})
+    assert r.status_code == 200
+    with Session(owner_engine) as db:
+        factors = db.scalars(select(MfaFactor).where(MfaFactor.user_id == m.user_id)).all()
+    assert len(factors) == 1 and factors[0].confirmed_at is not None
