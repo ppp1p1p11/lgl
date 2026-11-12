@@ -1,0 +1,39 @@
+---
+identifier: Lei 13.105/2015 (amostra de demonstração)
+short_name: CPC
+title: Código de Processo Civil — amostra de dispositivos sobre prazos
+doc_type: legislacao
+issuing_body: Congresso Nacional
+publication_date: 2015-03-17
+review_status: demonstracao_nao_conferida
+---
+CAPÍTULO III
+DOS PRAZOS
+Art. 183. A União, os Estados, o Distrito Federal, os Municípios e suas respectivas autarquias e fundações de direito público gozarão de prazo em dobro para todas as suas manifestações processuais, cuja contagem terá início a partir da intimação pessoal.
+§ 2º Não se aplica o benefício da contagem em dobro quando a lei estabelecer, de forma expressa, prazo próprio para o ente público.
+Art. 218. Os atos processuais serão realizados nos prazos prescritos em lei.
+§ 1º Quando a lei for omissa, o juiz determinará os prazos em consideração à complexidade do ato.
+§ 3º Inexistindo preceito legal ou prazo determinado pelo juiz, será de 5 (cinco) dias o prazo para a prática de ato processual a cargo da parte.
+§ 4º Será considerado tempestivo o ato praticado antes do termo inicial do prazo.
+Art. 219. Na contagem de prazo em dias, estabelecido por lei ou pelo juiz, computar-se-ão somente os dias úteis.
+Parágrafo único. O disposto neste artigo aplica-se somente aos prazos processuais.
+Art. 220. Suspende-se o curso do prazo processual nos dias compreendidos entre 20 de dezembro e 20 de janeiro, inclusive.
+§ 2º Durante a suspensão do prazo, não se realizarão audiências nem sessões de julgamento.
+Art. 224. Salvo disposição em contrário, os prazos serão contados excluindo o dia do começo e incluindo o dia do vencimento.
+§ 1º Os dias do começo e do vencimento do prazo serão protraídos para o primeiro dia útil seguinte, se coincidirem com dia em que o expediente forense for encerrado antes ou iniciado depois da hora normal ou houver indisponibilidade da comunicação eletrônica.
+§ 2º Considera-se como data de publicação o primeiro dia útil seguinte ao da disponibilização da informação no Diário da Justiça eletrônico.
+§ 3º A contagem do prazo terá início no primeiro dia útil que seguir ao da publicação.
+Art. 229. Os litisconsortes que tiverem diferentes procuradores, de escritórios de advocacia distintos, terão prazos contados em dobro para todas as suas manifestações, em qualquer juízo ou tribunal, independentemente de requerimento.
+§ 1º Cessa a contagem do prazo em dobro se, havendo apenas 2 (dois) réus, é oferecida defesa por apenas um deles.
+§ 2º Não se aplica o disposto no caput aos processos em autos eletrônicos.
+CAPÍTULO VI
+DA CONTESTAÇÃO
+Art. 335. O réu poderá oferecer contestação, por petição, no prazo de 15 (quinze) dias, cujo termo inicial será a data:
+I - da audiência de conciliação ou de mediação, ou da última sessão de conciliação, quando qualquer parte não comparecer ou, comparecendo, não houver autocomposição;
+II - do protocolo do pedido de cancelamento da audiência de conciliação ou de mediação apresentado pelo réu, quando ocorrer a hipótese do art. 334, § 4º, inciso I;
+III - prevista no art. 231, de acordo com o modo como foi feita a citação, nos demais casos.
+TÍTULO II
+DOS RECURSOS
+Art. 1.003. O prazo para interposição de recurso conta-se da data em que os advogados, a sociedade de advogados, a Advocacia Pública, a Defensoria Pública ou o Ministério Público são intimados da decisão.
+§ 5º Excetuados os embargos de declaração, o prazo para interpor os recursos e para responder-lhes é de 15 (quinze) dias.
+Art. 1.023. Os embargos serão opostos, no prazo de 5 (cinco) dias, em petição dirigida ao juiz, com indicação do erro, obscuridade, contradição ou omissão, e não se sujeitam a preparo.

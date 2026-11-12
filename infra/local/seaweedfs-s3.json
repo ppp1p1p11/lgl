@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "legalos-dev",
+      "credentials": [{ "accessKey": "legalos-dev", "secretKey": "legalos-dev-secret" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

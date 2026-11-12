@@ -1,0 +1,157 @@
+# CLAUDE.md — LegalOS Brasil (working name)
+
+Context for any Claude Code session working in this repo. Read this first, then
+`CLAUDE_CODE_PROMPT.md` (the founder's product brief, which is the source of truth
+for scope and rules).
+
+## Current status
+
+- Phase 0 (plan) — approved 2026-10-27.
+- Phase 1 (foundations) — done. Auth + MFA, roles, tenants with RLS, audit log, job
+  queue, object storage, CI, seed data.
+- Phase 2 plan approved 2026-10-29 (`docs/phase-2-plan.md`), split into 2a and 2b.
+- Phase 2a (matters + documents, no AI) — done (PR ppp1p1p11/lgl#1).
+- Phase 2b (AI on documents) — done.
+- **Phases 3–6, everything that needs no external service — built, awaiting founder
+  review** (founder asked to leave APIs for last): deadline engine + holidays + tasks,
+  legal corpus (structure, ingestion, search) with an unverified demo sample, legal
+  research, drafting from templates with Word export, team management, password change,
+  audit viewer, AI cost report, maintenance job. ADRs 0008–0010.
+- **Not built yet:** real-model evaluation (VERIFY AI-6, AI-7), official legal texts and
+  the 50-question research evaluation set, embeddings/re-ranking, DataJud, e-mail,
+  retention/legal hold/data-subject requests, backups, deployment in Brazil. See
+  `docs/before-pilot.md`.
+- Nothing about Brazilian law in the code (deadline rules, presets, templates, source
+  weights, demo corpus) has been checked by a lawyer: VERIFY DL-*, DRAFT-1, SRC-11, SRC-12.
+- AI runs on Anthropic's API (no Brazil region): only synthetic/public documents until a
+  lawyer approves the international-transfer setup (VERIFY REG-2).
+- Test documents: synthetic, or public sources whose terms were checked. Never collect
+  law firms' documents. No real client data until a lawyer reviews LGPD basics.
+
+## How to work in this repo
+
+- Work in phases (brief §9). At the end of each phase: stop, summarize, list what
+  the founder must do manually, wait for approval.
+- Before each phase, propose a short plan (files, data model changes, risks).
+- The founder is not a senior engineer: explain decisions briefly in plain
+  language and flag anything that needs action outside the code.
+- Never invent facts about Brazilian law, court APIs, or vendor capabilities.
+  Anything unconfirmed goes in `docs/VERIFY.md` with the source to check.
+- Record significant technical decisions as ADRs in `docs/adr/` (see
+  `docs/adr/README.md` for the template).
+- Keep this file up to date when conventions, commands, or architecture change.
+
+## Non-negotiable product rules (summary of brief §2)
+
+1. No ungrounded legal claims — every legal statement cites an indexed passage;
+   a citation verifier removes or marks "não verificado" anything it cannot match.
+2. Human-in-the-loop — consequential outputs are drafts until a named lawyer
+   approves; approvals store user, timestamp, output version.
+3. Explicit source hierarchy — legislation, súmulas vinculantes, precedentes
+   qualificados, súmulas, decisões, doutrina are distinct types with weights.
+4. Temporal validity — provisions are versioned (vigente / revogado / alterado);
+   answers state which version they used.
+5. Deadlines are proposals with visible reasoning; never auto-finalized.
+6. Uploaded documents are untrusted data, never instructions. Agents get only
+   the tools their workflow needs; no tool sends anything outside the system.
+7. Tenant isolation is absolute — queries, vector search, caches, logs.
+
+## Architecture (see `docs/architecture.md`)
+
+- `frontend/` — Next.js + React + TypeScript, UI in pt-BR only.
+- `backend/` — one Python package (`legalos`) with two entrypoints: the FastAPI
+  API and the background worker. Postgres-backed job queue.
+- PostgreSQL + pgvector, Row-Level Security on every tenant table.
+- S3-compatible object storage (SeaweedFS locally; Brazilian region in prod).
+- All AI calls go through `legalos.gateway` (redaction, minimization, logging,
+  provider routing). No other module may call an AI provider directly.
+- Legal corpus tables are global (shared, read-only to tenants); everything
+  else is tenant-scoped.
+
+Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
+
+## Conventions
+
+- Code, identifiers, comments, commit messages: **English**.
+- Domain terms keep their Portuguese name when there is no exact English
+  equivalent (`processo` → `Matter` in code, but `prazo`, `sumula`,
+  `intimacao`, `comarca` stay as-is). Glossary lives in `docs/data-model.md`.
+- All user-facing strings: **pt-BR**.
+- Every tenant-scoped table has a non-null `tenant_id` and an RLS policy.
+  The app connects as a non-owner role so RLS cannot be bypassed.
+- Migrations are hand-written SQL in `backend/alembic/versions/` (RLS policies and
+  grants are easier to review as SQL). Each new table needs: RLS enabled, policies,
+  and explicit `GRANT`s to the app role. `tests/test_tenant_isolation.py` fails if a
+  table has no RLS.
+- Every rule in the deadline engine cites its legal article in a comment.
+- Secrets never in the repo; document every variable in `.env.example`.
+
+## Database rules that are easy to get wrong
+
+- Tenant context: `legalos.core.db.set_db_context(db, user_id=…, tenant_id=…)` inside
+  the transaction. Values come only from the authenticated session or a job row, never
+  from request input. API handlers get it via the `DbSession` + principal dependencies.
+- `INSERT … RETURNING` needs the row to pass the table's SELECT policy too. Tables where
+  the app may write rows it cannot read (e.g. `audit_log` events without a firm) set
+  `__table_args__ = {"implicit_returning": False}`.
+- Work that must persist even when the request fails (failed-login audit, throttling,
+  MFA failure counters) uses `independent_transaction()` / `record_independently()`.
+- Lookups that happen before anyone is authenticated, and queue claim/finish, go through
+  the `SECURITY DEFINER` functions in migration 0001. Do not add new ones casually:
+  each one bypasses RLS.
+- Never log document text, prompts, or identifiers. Logs are JSON, scrubbed as a safety
+  net (`legalos.core.logging`).
+- Foreign keys between firm tables are composite `(tenant_id, id)`; follow that pattern
+  for new tables (see migration 0002).
+- New model modules must be added to `legalos/all_models.py`, or the worker cannot resolve
+  foreign keys (a test checks this).
+- CPF/CNPJ: store with `matters.service.protect_document_number` (encrypted + keyed
+  hash); return masked except in audited detail views.
+- Uploaded files are untrusted: detect type from content (`documents.filetypes`), parse
+  only in the worker, keep the limits in `documents.extraction`.
+- AI: call only `legalos.gateway.service.call` (a test forbids importing `anthropic`
+  elsewhere). Document text goes in `DocumentInput` blocks, never in instructions. Every
+  quote/citation must pass `ai.verify.locate`; unverifiable content is dropped or flagged.
+  AI outputs are immutable versions; changes create a new version that needs approval.
+- Legal corpus tables are written only by `python -m legalos.corpus.ingest` (owner role);
+  the app role has SELECT only. Research and drafting may cite only what search returned.
+- Deadlines: `deadlines/engine.py` stays pure (no DB, no clock, no AI); every step it
+  takes must appear in the reasoning shown to the user. Holidays are data.
+- Tests use a scripted provider (`monkeypatch.setattr(gateway, "get_provider", ...)`);
+  without `ANTHROPIC_API_KEY` the app uses the rule-based demo provider (never in
+  production).
+
+## Commands
+
+| Task | Command |
+|---|---|
+| Whole stack on a Mac/Linux without Docker | `./run-local.sh` (`./run-local.sh reset` wipes `.local/`) |
+| Whole stack locally with Docker | `cp .env.example .env && docker compose up --build` |
+| Seed fictional firms | `docker compose run --rm api python -m legalos.seed` |
+| Load legal texts | `cd backend && uv run python -m legalos.corpus.ingest --demo` (demo sample) or `… ingest file.txt` (format: see `corpus/parser.py`) |
+| Housekeeping job | `cd backend && uv run python -m legalos.maintenance` |
+| Browser preview behind another address | `LEGALOS_LOCAL_PREVIEW=1 ./run-local.sh` (sets `LEGALOS_PREVIEW_MODE`; refused in production) |
+| Backend tests | `cd backend && uv run pytest` (needs Postgres+pgvector; `LEGALOS_TEST_ADMIN_URL`, default `postgresql://postgres:postgres@localhost:5432/postgres`) |
+| Storage integration test | set `LEGALOS_TEST_S3_ENDPOINT=http://localhost:8333` with SeaweedFS running |
+| OCR accuracy report | `cd backend && uv run python scripts/ocr_eval.py` (needs `tesseract` + `tesseract-ocr-por`) |
+| Synthetic test documents | `cd backend && uv run python scripts/make_test_corpus.py ../test-documents` |
+| Live AI evaluation (paid) | `cd backend && ANTHROPIC_API_KEY=... uv run python scripts/ai_eval.py --yes` |
+| Backend lint/format/types | `uv run ruff check . && uv run ruff format --check . && uv run mypy` |
+| New migration | add a file in `backend/alembic/versions/` (SQL via `op.execute`) |
+| Frontend | `cd frontend && pnpm lint && pnpm typecheck && pnpm test && pnpm build` |
+| After API changes | `cd backend && uv run python scripts/export_openapi.py && cd ../frontend && pnpm gen:api` (CI checks both are committed) |
+
+## Key docs
+
+| File | Purpose |
+|---|---|
+| `CLAUDE_CODE_PROMPT.md` | Founder's product brief |
+| `docs/phase-0-plan.md` | Phase 0 summary, questions, accounts/keys, Phase 1 preview |
+| `docs/phase-2-plan.md` | Phase 2 scope, decisions from founder answers, risks |
+| `docs/security/threat-model.md` | Threats, mitigations and known gaps (update every phase) |
+| `docs/architecture.md` | Architecture diagrams (Mermaid) |
+| `docs/data-model.md` | Entities, tenancy, ER diagram, glossary |
+| `docs/repo-structure.md` | Directory layout |
+| `docs/before-pilot.md` | What must happen before a real firm uses the system |
+| `docs/VERIFY.md` | Facts that need external confirmation before we rely on them |
+| `docs/adr/` | Architecture decision records |
