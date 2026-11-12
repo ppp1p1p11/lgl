@@ -1,6 +1,65 @@
 {
   "components": {
     "schemas": {
+      "AiReportOut": {
+        "properties": {
+          "month": {
+            "title": "Month",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/AiReportRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "total_cost_usd": {
+            "title": "Total Cost Usd",
+            "type": "string"
+          }
+        },
+        "required": [
+          "month",
+          "total_cost_usd",
+          "rows"
+        ],
+        "title": "AiReportOut",
+        "type": "object"
+      },
+      "AiReportRow": {
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "string"
+          },
+          "input_tokens": {
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "output_tokens": {
+            "title": "Output Tokens",
+            "type": "integer"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          }
+        },
+        "required": [
+          "purpose",
+          "calls",
+          "input_tokens",
+          "output_tokens",
+          "cost_usd"
+        ],
+        "title": "AiReportRow",
+        "type": "object"
+      },
       "AiSettingsIn": {
         "properties": {
           "monthly_budget_usd": {
@@ -190,6 +249,17 @@
             "title": "Action",
             "type": "string"
           },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
           "actor_user_id": {
             "anyOf": [
               {
@@ -243,6 +313,7 @@
           "id",
           "occurred_at",
           "actor_user_id",
+          "actor_name",
           "action",
           "entity_type",
           "entity_id",
@@ -883,6 +954,281 @@
           "label"
         ],
         "title": "DoublingReasonOut",
+        "type": "object"
+      },
+      "DraftDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "output": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OutputOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "output_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Id"
+          },
+          "provider": {
+            "enum": [
+              "anthropic",
+              "demo",
+              "none"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "title": "Run Status",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "rascunho",
+                  "em_revisao",
+                  "aprovado",
+                  "rejeitado"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "template_id": {
+            "title": "Template Id",
+            "type": "string"
+          },
+          "template_name": {
+            "title": "Template Name",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "version_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version No"
+          }
+        },
+        "required": [
+          "run_id",
+          "output_id",
+          "template_id",
+          "template_name",
+          "title",
+          "run_status",
+          "error_code",
+          "status",
+          "version_no",
+          "created_at",
+          "provider",
+          "output"
+        ],
+        "title": "DraftDetail",
+        "type": "object"
+      },
+      "DraftIn": {
+        "properties": {
+          "instructions": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "legal_topics": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legal Topics"
+          },
+          "template_id": {
+            "maxLength": 50,
+            "title": "Template Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_id"
+        ],
+        "title": "DraftIn",
+        "type": "object"
+      },
+      "DraftSummary": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "output_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Id"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "run_status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "title": "Run Status",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "rascunho",
+                  "em_revisao",
+                  "aprovado",
+                  "rejeitado"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "template_id": {
+            "title": "Template Id",
+            "type": "string"
+          },
+          "template_name": {
+            "title": "Template Name",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "version_no": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version No"
+          }
+        },
+        "required": [
+          "run_id",
+          "output_id",
+          "template_id",
+          "template_name",
+          "title",
+          "run_status",
+          "error_code",
+          "status",
+          "version_no",
+          "created_at"
+        ],
+        "title": "DraftSummary",
         "type": "object"
       },
       "EventIn": {
@@ -1678,6 +2024,10 @@
             "title": "Mfa Verified",
             "type": "boolean"
           },
+          "must_change_password": {
+            "title": "Must Change Password",
+            "type": "boolean"
+          },
           "permissions": {
             "items": {
               "$ref": "#/components/schemas/Permission"
@@ -1692,6 +2042,7 @@
         "required": [
           "user",
           "mfa_verified",
+          "must_change_password",
           "current_firm",
           "permissions",
           "firms"
@@ -1699,16 +2050,18 @@
         "title": "MeResponse",
         "type": "object"
       },
-      "MemberIn": {
+      "MemberAddedOut": {
         "properties": {
-          "responsibility": {
-            "default": "equipe",
-            "enum": [
-              "responsavel",
-              "equipe"
+          "temporary_password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "title": "Responsibility",
-            "type": "string"
+            "title": "Temporary Password"
           },
           "user_id": {
             "format": "uuid",
@@ -1717,9 +2070,10 @@
           }
         },
         "required": [
-          "user_id"
+          "user_id",
+          "temporary_password"
         ],
-        "title": "MemberIn",
+        "title": "MemberAddedOut",
         "type": "object"
       },
       "MfaCodeRequest": {
@@ -2054,6 +2408,28 @@
           "document_number"
         ],
         "title": "PartyOut",
+        "type": "object"
+      },
+      "PasswordChangeRequest": {
+        "properties": {
+          "current_password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Current Password",
+            "type": "string"
+          },
+          "new_password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "PasswordChangeRequest",
         "type": "object"
       },
       "Permission": {
@@ -2571,6 +2947,18 @@
         "title": "Role",
         "type": "string"
       },
+      "RoleIn": {
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "required": [
+          "role"
+        ],
+        "title": "RoleIn",
+        "type": "object"
+      },
       "RuleSetOut": {
         "properties": {
           "basis": {
@@ -2720,6 +3108,26 @@
           "snippet"
         ],
         "title": "SearchHitOut",
+        "type": "object"
+      },
+      "SectionEditIn": {
+        "properties": {
+          "base_version_no": {
+            "title": "Base Version No",
+            "type": "integer"
+          },
+          "text": {
+            "maxLength": 50000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "base_version_no",
+          "text"
+        ],
+        "title": "SectionEditIn",
         "type": "object"
       },
       "StepOut": {
@@ -2979,6 +3387,39 @@
           }
         },
         "title": "TaskPatch",
+        "type": "object"
+      },
+      "TemplateOut": {
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "uses_documents": {
+            "title": "Uses Documents",
+            "type": "boolean"
+          },
+          "uses_legal_corpus": {
+            "title": "Uses Legal Corpus",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "uses_documents",
+          "uses_legal_corpus"
+        ],
+        "title": "TemplateOut",
         "type": "object"
       },
       "UploadRequest": {
@@ -3335,6 +3776,29 @@
         "title": "DecisionIn",
         "type": "object"
       },
+      "legalos__matters__router__MemberIn": {
+        "properties": {
+          "responsibility": {
+            "default": "equipe",
+            "enum": [
+              "responsavel",
+              "equipe"
+            ],
+            "title": "Responsibility",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "MemberIn",
+        "type": "object"
+      },
       "legalos__matters__router__MemberOut": {
         "properties": {
           "name": {
@@ -3363,6 +3827,56 @@
         "title": "MemberOut",
         "type": "object"
       },
+      "legalos__tenancy__router__MemberIn": {
+        "properties": {
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          },
+          "oab_number": {
+            "anyOf": [
+              {
+                "maxLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oab Number"
+          },
+          "oab_uf": {
+            "anyOf": [
+              {
+                "maxLength": 2,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oab Uf"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role"
+        ],
+        "title": "MemberIn",
+        "type": "object"
+      },
       "legalos__tenancy__router__MemberOut": {
         "properties": {
           "email": {
@@ -3372,6 +3886,17 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "oab": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Oab"
           },
           "role": {
             "$ref": "#/components/schemas/Role"
@@ -3449,6 +3974,109 @@
         "summary": "Decide",
         "tags": [
           "ai"
+        ]
+      }
+    },
+    "/api/ai-outputs/{output_id}/export.docx": {
+      "get": {
+        "operationId": "export_docx_api_ai_outputs__output_id__export_docx_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Export Docx",
+        "tags": [
+          "drafting"
+        ]
+      }
+    },
+    "/api/ai-outputs/{output_id}/sections/{section_index}": {
+      "post": {
+        "operationId": "edit_section_api_ai_outputs__output_id__sections__section_index__post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "output_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Output Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "section_index",
+            "required": true,
+            "schema": {
+              "title": "Section Index",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SectionEditIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutputOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Section",
+        "tags": [
+          "drafting"
         ]
       }
     },
@@ -3774,6 +4402,40 @@
           }
         },
         "summary": "Mfa Verify",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/password": {
+      "post": {
+        "operationId": "change_password_api_auth_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change Password",
         "tags": [
           "auth"
         ]
@@ -4470,6 +5132,96 @@
         ]
       }
     },
+    "/api/draft-templates": {
+      "get": {
+        "operationId": "list_templates_api_draft_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateOut"
+                  },
+                  "title": "Response List Templates Api Draft Templates Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Templates",
+        "tags": [
+          "drafting"
+        ]
+      }
+    },
+    "/api/drafts/{run_id}": {
+      "get": {
+        "operationId": "get_draft_api_drafts__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Draft",
+        "tags": [
+          "drafting"
+        ]
+      }
+    },
+    "/api/firm/ai-report": {
+      "get": {
+        "description": "AI cost per kind of work this month (brief Phase 6: \"AI cost per workflow\").",
+        "operationId": "ai_report_api_firm_ai_report_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiReportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ai Report",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
     "/api/firm/ai-settings": {
       "patch": {
         "operationId": "update_ai_settings_api_firm_ai_settings_patch",
@@ -4552,6 +5304,125 @@
           }
         },
         "summary": "List Members",
+        "tags": [
+          "firm"
+        ]
+      },
+      "post": {
+        "operationId": "add_member_api_firm_members_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/legalos__tenancy__router__MemberIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAddedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Member",
+        "tags": [
+          "firm"
+        ]
+      }
+    },
+    "/api/firm/members/{user_id}": {
+      "delete": {
+        "operationId": "remove_member_api_firm_members__user_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Member",
+        "tags": [
+          "firm"
+        ]
+      },
+      "patch": {
+        "operationId": "change_role_api_firm_members__user_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change Role",
         "tags": [
           "firm"
         ]
@@ -5154,6 +6025,104 @@
         ]
       }
     },
+    "/api/matters/{matter_id}/drafts": {
+      "get": {
+        "operationId": "list_drafts_api_matters__matter_id__drafts_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DraftSummary"
+                  },
+                  "title": "Response List Drafts Api Matters  Matter Id  Drafts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Drafts",
+        "tags": [
+          "drafting"
+        ]
+      },
+      "post": {
+        "operationId": "start_draft_api_matters__matter_id__drafts_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DraftSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Draft",
+        "tags": [
+          "drafting"
+        ]
+      }
+    },
     "/api/matters/{matter_id}/events": {
       "get": {
         "operationId": "list_events_api_matters__matter_id__events_get",
@@ -5272,7 +6241,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MemberIn"
+                "$ref": "#/components/schemas/legalos__matters__router__MemberIn"
               }
             }
           },

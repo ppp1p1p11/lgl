@@ -139,6 +139,8 @@ def remove_items(
     """New version without the given facts/segments. Citations follow the kept items."""
     _check_base(output, base_version_no)
     base = current_version(db, output)
+    if output.kind not in ITEM_LISTS:
+        raise ReviewError("invalid_items", 400)  # drafts are edited per section instead
     key = ITEM_LISTS[output.kind]
     items: list[Any] = base.content[key]
     if not remove or any(i < 0 or i >= len(items) for i in remove):

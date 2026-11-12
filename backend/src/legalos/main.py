@@ -13,6 +13,7 @@ from legalos.core.middleware import origin_check, security_headers_and_logging
 from legalos.corpus.router import router as corpus_router
 from legalos.deadlines.router import router as deadlines_router
 from legalos.documents.router import router as documents_router
+from legalos.drafting.router import router as drafting_router
 from legalos.matters.router import router as matters_router
 from legalos.storage.router import router as storage_router
 from legalos.tenancy.router import router as firm_router
@@ -29,7 +30,7 @@ def create_app() -> FastAPI:
         openapi_url="/api/openapi.json" if settings.environment != "production" else None,
     )
     # Starlette runs the last-added middleware first.
-    app.middleware("http")(origin_check(settings.allowed_origins))
+    app.middleware("http")(origin_check(settings.allowed_origins, allow_any=settings.preview_mode))
     app.middleware("http")(security_headers_and_logging)
 
     app.include_router(auth_router)
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     app.include_router(ai_router)
     app.include_router(deadlines_router)
     app.include_router(corpus_router)
+    app.include_router(drafting_router)
 
     @app.get("/api/health", tags=["system"])
     def health(db: DbSession) -> dict[str, str]:

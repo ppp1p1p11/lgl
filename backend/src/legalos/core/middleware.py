@@ -24,15 +24,20 @@ SECURITY_HEADERS = {
 Handler = Callable[[Request], Awaitable[Response]]
 
 
-def origin_check(allowed_origins: list[str]) -> Callable[[Request, Handler], Awaitable[Response]]:
+def origin_check(
+    allowed_origins: list[str], *, allow_any: bool = False
+) -> Callable[[Request, Handler], Awaitable[Response]]:
     """Reject state-changing requests sent by a browser from another site (CSRF defence,
     on top of SameSite=Strict cookies). Requests without an Origin header (non-browser
-    clients) are allowed; they cannot carry a victim's cookie cross-site."""
+    clients) are allowed; they cannot carry a victim's cookie cross-site.
+
+    `allow_any` (development preview mode only) turns the check off."""
     allowed = set(allowed_origins)
 
     async def middleware(request: Request, call_next: Handler) -> Response:
         origin = request.headers.get("origin")
-        if request.method in _UNSAFE_METHODS and origin is not None and origin not in allowed:
+        blocked = origin is not None and origin not in allowed and not allow_any
+        if request.method in _UNSAFE_METHODS and blocked:
             return JSONResponse({"detail": "origin_not_allowed"}, status_code=403)
         return await call_next(request)
 

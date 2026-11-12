@@ -43,6 +43,8 @@ class AuthErrorCode(StrEnum):
     NO_FIRM_SELECTED = "no_firm_selected"
     NOT_A_MEMBER = "not_a_member"
     FORBIDDEN = "forbidden"
+    WRONG_PASSWORD = "wrong_password"  # noqa: S105 - an error code, not a secret
+    WEAK_PASSWORD = "weak_password"  # noqa: S105
 
 
 class AuthError(Exception):
@@ -423,3 +425,49 @@ def list_my_firms(db: Session, user_id: uuid.UUID) -> list[FirmSummary]:
         .order_by(Tenant.name)
     ).all()
     return [FirmSummary(id=r.id, name=r.name, role=r.role) for r in rows]
+
+
+# --- Password -----------------------------------------------------------------------------
+
+MIN_PASSWORD_LENGTH = 12
+
+
+def change_password(
+    db: Session,
+    principal: Principal,
+    *,
+    current_password: str,
+    new_password: str,
+    ip: str | None,
+) -> None:
+    user = db.get(User, principal.user_id)
+    assert user is not None
+    if not crypto.verify_password(user.password_hash, current_password):
+        record_independently(
+            "auth.password_change_failed",
+            tenant_id=principal.tenant_id,
+            actor_user_id=principal.user_id,
+            ip=ip,
+        )
+        raise AuthError(AuthErrorCode.WRONG_PASSWORD, 403)
+    if len(new_password) < MIN_PASSWORD_LENGTH or new_password == current_password:
+        raise AuthError(AuthErrorCode.WEAK_PASSWORD, 400)
+    user.password_hash = crypto.hash_password(new_password)
+    user.must_change_password = False
+    # Other devices must log in again with the new password.
+    db.execute(
+        update(AuthSession)
+        .where(
+            AuthSession.user_id == principal.user_id,
+            AuthSession.id != principal.session_id,
+            AuthSession.revoked_at.is_(None),
+        )
+        .values(revoked_at=_now())
+    )
+    record(
+        db,
+        "auth.password_changed",
+        tenant_id=principal.tenant_id,
+        actor_user_id=principal.user_id,
+        ip=ip,
+    )

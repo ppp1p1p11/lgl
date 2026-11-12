@@ -1,4 +1,5 @@
 import uuid
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, EmailStr, Field
@@ -61,9 +62,15 @@ class FirmOut(BaseModel):
     role: Role
 
 
+class PasswordChangeRequest(BaseModel):
+    current_password: str = Field(min_length=1, max_length=1024)
+    new_password: str = Field(min_length=1, max_length=1024)
+
+
 class MeResponse(BaseModel):
     user: UserOut
     mfa_verified: bool
+    must_change_password: bool
     current_firm: FirmOut | None
     permissions: list[Permission]
     firms: list[FirmOut]
@@ -73,15 +80,22 @@ def _raise(error: service.AuthError) -> None:
     raise HTTPException(error.status_code, error.code.value) from error
 
 
-def _set_session_cookie(response: Response, token: str) -> None:
+def _set_session_cookie(request: Request, response: Response, token: str) -> None:
     settings = get_settings()
+    secure = settings.session_cookie_secure
+    samesite: Literal["strict", "lax", "none"] = "strict"
+    if settings.preview_mode:
+        # Development preview: the page may be embedded under another address. Browsers
+        # only accept SameSite=None together with Secure, which needs HTTPS.
+        https = (request.headers.get("origin") or "").startswith("https://")
+        secure, samesite = https, ("none" if https else "lax")
     response.set_cookie(
         SESSION_COOKIE,
         token,
         max_age=settings.session_ttl_hours * 3600,
         httponly=True,
-        secure=settings.session_cookie_secure,
-        samesite="strict",
+        secure=secure,
+        samesite=samesite,
         path="/",
     )
 
@@ -98,7 +112,7 @@ def login(body: LoginRequest, request: Request, response: Response, db: DbSessio
         )
     except service.AuthError as e:
         _raise(e)
-    _set_session_cookie(response, result.token)
+    _set_session_cookie(request, response, result.token)
     return LoginResponse(next_step=result.next_step)
 
 
@@ -158,6 +172,7 @@ def me(principal: AnyPrincipal, db: DbSession) -> MeResponse:
     return MeResponse(
         user=UserOut(id=user.id, name=user.name, email=user.email),
         mfa_verified=principal.mfa_verified,
+        must_change_password=user.must_change_password,
         current_firm=current,
         permissions=permissions,
         firms=firms,
@@ -170,5 +185,21 @@ def switch_firm(
 ) -> None:
     try:
         service.switch_tenant(db, principal, body.tenant_id, ip=client_ip(request))
+    except service.AuthError as e:
+        _raise(e)
+
+
+@router.post("/password", status_code=204)
+def change_password(
+    body: PasswordChangeRequest, request: Request, principal: CurrentPrincipal, db: DbSession
+) -> None:
+    try:
+        service.change_password(
+            db,
+            principal,
+            current_password=body.current_password,
+            new_password=body.new_password,
+            ip=client_ip(request),
+        )
     except service.AuthError as e:
         _raise(e)

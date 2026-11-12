@@ -21,6 +21,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/ai-outputs/{output_id}/export.docx": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Export Docx */
+    get: operations["export_docx_api_ai_outputs__output_id__export_docx_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/ai-outputs/{output_id}/sections/{section_index}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Edit Section */
+    post: operations["edit_section_api_ai_outputs__output_id__sections__section_index__post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/ai-outputs/{output_id}/submit": {
     parameters: {
       query?: never;
@@ -168,6 +202,23 @@ export interface paths {
     put?: never;
     /** Mfa Verify */
     post: operations["mfa_verify_api_auth_mfa_verify_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/auth/password": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Change Password */
+    post: operations["change_password_api_auth_password_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -423,6 +474,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/draft-templates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Templates */
+    get: operations["list_templates_api_draft_templates_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/drafts/{run_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Draft */
+    get: operations["get_draft_api_drafts__run_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/firm/ai-report": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Ai Report
+     * @description AI cost per kind of work this month (brief Phase 6: "AI cost per workflow").
+     */
+    get: operations["ai_report_api_firm_ai_report_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/firm/ai-settings": {
     parameters: {
       query?: never;
@@ -467,11 +572,30 @@ export interface paths {
     /** List Members */
     get: operations["list_members_api_firm_members_get"];
     put?: never;
-    post?: never;
+    /** Add Member */
+    post: operations["add_member_api_firm_members_post"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/api/firm/members/{user_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove Member */
+    delete: operations["remove_member_api_firm_members__user_id__delete"];
+    options?: never;
+    head?: never;
+    /** Change Role */
+    patch: operations["change_role_api_firm_members__user_id__patch"];
     trace?: never;
   };
   "/api/health": {
@@ -613,6 +737,24 @@ export interface paths {
     put?: never;
     /** Start Upload */
     post: operations["start_upload_api_matters__matter_id__documents_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/drafts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Drafts */
+    get: operations["list_drafts_api_matters__matter_id__drafts_get"];
+    put?: never;
+    /** Start Draft */
+    post: operations["start_draft_api_matters__matter_id__drafts_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -802,6 +944,28 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** AiReportOut */
+    AiReportOut: {
+      /** Month */
+      month: string;
+      /** Rows */
+      rows: components["schemas"]["AiReportRow"][];
+      /** Total Cost Usd */
+      total_cost_usd: string;
+    };
+    /** AiReportRow */
+    AiReportRow: {
+      /** Calls */
+      calls: number;
+      /** Cost Usd */
+      cost_usd: string;
+      /** Input Tokens */
+      input_tokens: number;
+      /** Output Tokens */
+      output_tokens: number;
+      /** Purpose */
+      purpose: string;
+    };
     /** AiSettingsIn */
     AiSettingsIn: {
       /** Monthly Budget Usd */
@@ -860,6 +1024,8 @@ export interface components {
     AuditEventOut: {
       /** Action */
       action: string;
+      /** Actor Name */
+      actor_name: string | null;
       /** Actor User Id */
       actor_user_id: string | null;
       /** Details */
@@ -1113,6 +1279,85 @@ export interface components {
       id: "fazenda_publica" | "ministerio_publico" | "defensoria_publica" | "litisconsortes";
       /** Label */
       label: string;
+    };
+    /** DraftDetail */
+    DraftDetail: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Error Code */
+      error_code: string | null;
+      output: components["schemas"]["OutputOut"] | null;
+      /** Output Id */
+      output_id: string | null;
+      /**
+       * Provider
+       * @enum {string}
+       */
+      provider: "anthropic" | "demo" | "none";
+      /**
+       * Run Id
+       * Format: uuid
+       */
+      run_id: string;
+      /**
+       * Run Status
+       * @enum {string}
+       */
+      run_status: "queued" | "running" | "succeeded" | "failed";
+      /** Status */
+      status: ("rascunho" | "em_revisao" | "aprovado" | "rejeitado") | null;
+      /** Template Id */
+      template_id: string;
+      /** Template Name */
+      template_name: string;
+      /** Title */
+      title: string | null;
+      /** Version No */
+      version_no: number | null;
+    };
+    /** DraftIn */
+    DraftIn: {
+      /** Instructions */
+      instructions?: string | null;
+      /** Legal Topics */
+      legal_topics?: string | null;
+      /** Template Id */
+      template_id: string;
+    };
+    /** DraftSummary */
+    DraftSummary: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Error Code */
+      error_code: string | null;
+      /** Output Id */
+      output_id: string | null;
+      /**
+       * Run Id
+       * Format: uuid
+       */
+      run_id: string;
+      /**
+       * Run Status
+       * @enum {string}
+       */
+      run_status: "queued" | "running" | "succeeded" | "failed";
+      /** Status */
+      status: ("rascunho" | "em_revisao" | "aprovado" | "rejeitado") | null;
+      /** Template Id */
+      template_id: string;
+      /** Template Name */
+      template_name: string;
+      /** Title */
+      title: string | null;
+      /** Version No */
+      version_no: number | null;
     };
     /** EventIn */
     EventIn: {
@@ -1407,18 +1652,16 @@ export interface components {
       firms: components["schemas"]["FirmOut"][];
       /** Mfa Verified */
       mfa_verified: boolean;
+      /** Must Change Password */
+      must_change_password: boolean;
       /** Permissions */
       permissions: components["schemas"]["Permission"][];
       user: components["schemas"]["UserOut"];
     };
-    /** MemberIn */
-    MemberIn: {
-      /**
-       * Responsibility
-       * @default equipe
-       * @enum {string}
-       */
-      responsibility: "responsavel" | "equipe";
+    /** MemberAddedOut */
+    MemberAddedOut: {
+      /** Temporary Password */
+      temporary_password: string | null;
       /**
        * User Id
        * Format: uuid
@@ -1552,6 +1795,13 @@ export interface components {
         | "executado"
         | "terceiro"
         | "outro";
+    };
+    /** PasswordChangeRequest */
+    PasswordChangeRequest: {
+      /** Current Password */
+      current_password: string;
+      /** New Password */
+      new_password: string;
     };
     /**
      * Permission
@@ -1752,6 +2002,10 @@ export interface components {
      * @enum {string}
      */
     Role: "socio" | "advogado" | "estagiario" | "administrativo";
+    /** RoleIn */
+    RoleIn: {
+      role: components["schemas"]["Role"];
+    };
     /** RuleSetOut */
     RuleSetOut: {
       /** Basis */
@@ -1813,6 +2067,13 @@ export interface components {
        * Format: uuid
        */
       version_id: string;
+    };
+    /** SectionEditIn */
+    SectionEditIn: {
+      /** Base Version No */
+      base_version_no: number;
+      /** Text */
+      text: string;
     };
     /** StepOut */
     StepOut: {
@@ -1892,6 +2153,19 @@ export interface components {
       status?: ("aberta" | "concluida" | "cancelada") | null;
       /** Title */
       title?: string | null;
+    };
+    /** TemplateOut */
+    TemplateOut: {
+      /** Description */
+      description: string;
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** Uses Documents */
+      uses_documents: boolean;
+      /** Uses Legal Corpus */
+      uses_legal_corpus: boolean;
     };
     /** UploadRequest */
     UploadRequest: {
@@ -2013,6 +2287,20 @@ export interface components {
       /** Note */
       note?: string | null;
     };
+    /** MemberIn */
+    legalos__matters__router__MemberIn: {
+      /**
+       * Responsibility
+       * @default equipe
+       * @enum {string}
+       */
+      responsibility: "responsavel" | "equipe";
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+    };
     /** MemberOut */
     legalos__matters__router__MemberOut: {
       /** Name */
@@ -2028,12 +2316,29 @@ export interface components {
        */
       user_id: string;
     };
+    /** MemberIn */
+    legalos__tenancy__router__MemberIn: {
+      /**
+       * Email
+       * Format: email
+       */
+      email: string;
+      /** Name */
+      name: string;
+      /** Oab Number */
+      oab_number?: string | null;
+      /** Oab Uf */
+      oab_uf?: string | null;
+      role: components["schemas"]["Role"];
+    };
     /** MemberOut */
     legalos__tenancy__router__MemberOut: {
       /** Email */
       email: string;
       /** Name */
       name: string;
+      /** Oab */
+      oab?: string | null;
       role: components["schemas"]["Role"];
       /**
        * User Id
@@ -2067,6 +2372,73 @@ export interface operations {
     responses: {
       /** @description Successful Response */
       200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OutputOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  export_docx_api_ai_outputs__output_id__export_docx_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        output_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  edit_section_api_ai_outputs__output_id__sections__section_index__post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        output_id: string;
+        section_index: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SectionEditIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
         headers: {
           [name: string]: unknown;
         };
@@ -2320,6 +2692,37 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["MfaVerifyRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  change_password_api_auth_password_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordChangeRequest"];
       };
     };
     responses: {
@@ -2828,6 +3231,77 @@ export interface operations {
       };
     };
   };
+  list_templates_api_draft_templates_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TemplateOut"][];
+        };
+      };
+    };
+  };
+  get_draft_api_drafts__run_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DraftDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  ai_report_api_firm_ai_report_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AiReportOut"];
+        };
+      };
+    };
+  };
   update_ai_settings_api_firm_ai_settings_patch: {
     parameters: {
       query?: never;
@@ -2897,6 +3371,101 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["legalos__tenancy__router__MemberOut"][];
+        };
+      };
+    };
+  };
+  add_member_api_firm_members_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["legalos__tenancy__router__MemberIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MemberAddedOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  remove_member_api_firm_members__user_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        user_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  change_role_api_firm_members__user_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        user_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RoleIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };
@@ -3310,6 +3879,72 @@ export interface operations {
       };
     };
   };
+  list_drafts_api_matters__matter_id__drafts_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DraftSummary"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  start_draft_api_matters__matter_id__drafts_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DraftIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DraftSummary"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   list_events_api_matters__matter_id__events_get: {
     parameters: {
       query?: never;
@@ -3387,7 +4022,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["MemberIn"];
+        "application/json": components["schemas"]["legalos__matters__router__MemberIn"];
       };
     };
     responses: {

@@ -27,6 +27,8 @@ class User(TimestampMixin, Base):
     oab_number: Mapped[str | None] = mapped_column(String(20))
     oab_uf: Mapped[str | None] = mapped_column(String(2))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Set when a sócio creates the account with a temporary password.
+    must_change_password: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class MfaFactor(TimestampMixin, Base):

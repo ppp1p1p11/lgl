@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     # Must be true outside local development (cookie only sent over HTTPS).
     session_cookie_secure: bool = True
     session_ttl_hours: int = 12
+    # Browser preview of a development copy behind another address (e.g. a cloud preview
+    # pane): accepts any Origin and relaxes the cookie's SameSite so login works inside an
+    # embedded page. Weakens CSRF protection, so it is refused in production.
+    preview_mode: bool = False
     pending_mfa_ttl_minutes: int = 10
 
     # Login throttling.
@@ -61,6 +65,12 @@ class Settings(BaseSettings):
 
     # Worker
     worker_poll_seconds: float = 2.0
+
+    @model_validator(mode="after")
+    def _no_preview_in_production(self) -> "Settings":
+        if self.environment == "production" and self.preview_mode:
+            raise ValueError("LEGALOS_PREVIEW_MODE cannot be enabled in production")
+        return self
 
 
 @lru_cache

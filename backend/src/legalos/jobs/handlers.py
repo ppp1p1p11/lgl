@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 import legalos.ai.research
 import legalos.ai.workflows
-import legalos.documents.service  # noqa: F401
+import legalos.documents.service
+import legalos.drafting.service  # noqa: F401
 from legalos.audit.service import record
 from legalos.jobs.models import Job
 from legalos.jobs.queue import handler

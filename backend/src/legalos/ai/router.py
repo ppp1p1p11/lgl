@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Annotated, Any, Literal
 
@@ -408,4 +408,51 @@ def get_research(run_id: uuid.UUID, _: Viewer, db: DbSession) -> ResearchDetail:
         **_research_summary(db, run).model_dump(),
         provider=provider.name if provider else "none",
         output=_output_out(db, output) if output else None,
+    )
+
+
+class AiReportRow(BaseModel):
+    purpose: str
+    calls: int
+    input_tokens: int
+    output_tokens: int
+    cost_usd: Decimal
+
+
+class AiReportOut(BaseModel):
+    month: str
+    total_cost_usd: Decimal
+    rows: list[AiReportRow]
+
+
+@router.get("/firm/ai-report")
+def ai_report(principal: FirmManager, db: DbSession) -> AiReportOut:
+    """AI cost per kind of work this month (brief Phase 6: "AI cost per workflow")."""
+    month_start = func.date_trunc("month", func.now())
+    rows = db.execute(
+        select(
+            GatewayCall.purpose,
+            func.count(),
+            func.sum(GatewayCall.input_tokens),
+            func.sum(GatewayCall.output_tokens),
+            func.sum(GatewayCall.cost_usd),
+        )
+        .where(GatewayCall.created_at >= month_start)
+        .group_by(GatewayCall.purpose)
+        .order_by(func.sum(GatewayCall.cost_usd).desc(), GatewayCall.purpose)
+    ).all()
+    report = [
+        AiReportRow(
+            purpose=purpose,
+            calls=calls,
+            input_tokens=tokens_in or 0,
+            output_tokens=tokens_out or 0,
+            cost_usd=cost or Decimal(0),
+        )
+        for purpose, calls, tokens_in, tokens_out, cost in rows
+    ]
+    return AiReportOut(
+        month=datetime.now(UTC).strftime("%Y-%m"),
+        total_cost_usd=sum((r.cost_usd for r in report), Decimal(0)),
+        rows=report,
     )
