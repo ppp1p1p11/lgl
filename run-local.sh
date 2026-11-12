@@ -4,6 +4,10 @@
 #   ./run-local.sh          set up (first time) and start everything
 #   ./run-local.sh reset    delete all local data (database, uploaded files, settings)
 #
+# LEGALOS_LOCAL_PREVIEW=1 ./run-local.sh   also allow opening the app through another
+#   address (a cloud preview pane or a tunnel). Development only: it relaxes the login
+#   cookie and the cross-site request check.
+#
 # Everything lives in the .local/ folder of the project. Press Ctrl+C to stop.
 # Requires: Homebrew packages listed below (the script tells you what is missing).
 
@@ -131,6 +135,9 @@ fi
 # shellcheck disable=SC1091
 . "$LOCAL/env"
 export LEGALOS_ALLOWED_ORIGINS="[\"http://localhost:$WEB_PORT\"]"
+if [ "${LEGALOS_LOCAL_PREVIEW:-}" = "1" ]; then
+  export LEGALOS_PREVIEW_MODE=true
+fi
 
 # --- 3. Database ----------------------------------------------------------------------
 
@@ -162,6 +169,8 @@ step uv run python -m legalos.dbadmin
 step uv run alembic upgrade head
 step uv run python -m legalos.storage.bootstrap
 step uv run python -m legalos.seed
+# Demonstration sample of the legal corpus (not checked against the official text).
+step uv run python -m legalos.corpus.ingest --demo
 if [ ! -d "$ROOT/test-documents" ]; then
   step uv run python scripts/make_test_corpus.py "$ROOT/test-documents"
 fi

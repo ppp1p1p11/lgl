@@ -1,4 +1,4 @@
-# Threat model (v3, Phase 2b)
+# Threat model (v4, Phases 3–6 without external services)
 
 This document lists what we protect, from whom, and how. It is updated every phase.
 Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase given) · **⚠️ open risk**.
@@ -113,6 +113,21 @@ Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase giv
 | Prompts or answers leaking through logs | `gateway_calls` has no text columns; application logs never include document text | ✅ tested |
 | Approval of a version different from the one reviewed | Decisions name the version number; stale versions are refused; any change creates a new version that needs a new decision | ✅ tested |
 
+### 4.5d Research, drafting, deadlines and team management (Phases 3–6)
+
+| Threat | Mitigation | Status |
+|---|---|---|
+| The AI states law that is not in the corpus | The model only receives retrieved provisions; each citation must be found word for word in the cited unit; sentences without one are flagged "não verificado"; with no retrieved source there is no AI call at all | ✅ tested (scripted provider); ⚠️ never run on the real model (VERIFY AI-7) |
+| Outdated law presented as current | Search filters by validity on the requested date; the answer states the date and each source shows its status | ✅ tested |
+| Unverified legal text mistaken for the official one | Demo corpus is labelled wherever a source is shown in the app, and excluded when `environment=production` | ✅ tested; ⚠️ replace before real use (VERIFY SRC-12) |
+| A tenant alters the shared corpus | The application role has SELECT only on corpus tables; ingestion uses the owner role from the command line | ✅ tested |
+| A draft leaves the system looking final | Word export prints "RASCUNHO — NÃO APROVADO" until a lawyer approves that exact version, and always appends a review report; every export is audited | ✅ tested |
+| A wrong deadline is treated as final | Proposals show their reasoning, need a lawyer's confirmation, and a different date needs a written reason; holidays are never added silently | ✅ tested; ⚠️ rules unverified (VERIFY DL-1 to DL-12) |
+| A sócio locks the firm out or escalates someone silently | The last sócio cannot be demoted or removed; nobody removes themselves; all team changes are audited | ✅ tested |
+| Temporary passwords intercepted or kept | Shown once to the sócio, stored only as an Argon2id hash, the account is flagged until the password changes, and MFA setup is still required at first login | ✅ tested; ⚠️ replace with e-mail invitations (VERIFY INF-5, INF-5b) |
+| Stolen session survives a password change | Changing the password revokes every other session of that user | ✅ tested |
+| **Preview mode** left on (any Origin accepted, SameSite relaxed) | Off by default; the application refuses to start with it in production | ✅ tested |
+
 ### 4.6 Data protection and residency
 
 | Threat | Mitigation | Status |
@@ -130,15 +145,20 @@ Status: **✅ in place** (with tests where noted) · **🕒 planned** (phase giv
 | Malicious install scripts (npm) | pnpm blocks dependency build scripts by default | ✅ |
 | Base image drift | Pinned image tags; Dependabot for Dockerfiles | ✅ |
 
-## 5. Known gaps after Phase 2a
+## 5. Known gaps
 
-1. No password reset or invitation flow (needs transactional email, VERIFY INF-5).
-   Accounts are created by provisioning scripts for now.
-2. No general API rate limiting beyond login/MFA throttling (Phase 6, at the edge).
+1. No password reset or e-mail invitation (needs transactional e-mail, VERIFY INF-5).
+   A sócio creates accounts with a temporary password shown on screen.
+2. No general API rate limiting beyond login/MFA throttling (at the edge, before pilot).
 3. The encryption key comes from an environment variable. Move it to a cloud secret
-   manager / KMS before any real data (Phase 6).
+   manager / KMS before any real data.
 4. No external security review yet. Planned before the pilot.
 5. No antivirus scanning of uploaded files, and the worker that parses them is not
-   isolated yet (Phase 6).
-6. Uploads that are never completed leave `pending_upload` rows (and possibly orphan
-   objects). A cleanup job is planned for Phase 6.
+   isolated yet.
+6. `python -m legalos.maintenance` removes abandoned uploads and expired sessions, but
+   nothing schedules it yet (add a scheduled job at deployment).
+7. Legal rules, templates, source weights and the demo corpus are unreviewed by a lawyer
+   (VERIFY DL-*, DRAFT-1, SRC-11, SRC-12).
+8. Research and drafting have not been evaluated on the real model (VERIFY AI-7).
+9. Not built yet: DataJud connector, retention policies, legal holds, data-subject
+   requests, incident log, backups and restore test, production deployment in Brazil.

@@ -6,7 +6,7 @@ import { ErrorText } from "@/components/ErrorText";
 import { api } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { errorMessage } from "@/lib/errors";
-import { formatDateTime } from "@/lib/format";
+import { fill, formatDateTime, label } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { useCan } from "@/lib/session";
 
@@ -18,14 +18,6 @@ export type Highlight = { page: number; start: number; end: number };
 
 type Segment = { text: string; kind: "text" | "gap"; unverified: boolean };
 type Fact = { type: string; value: string; quote: string; page_number: number };
-
-function fill(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ""));
-}
-
-function label<T extends Record<string, string>>(map: T, key: string | null | undefined) {
-  return key && key in map ? map[key as keyof T] : (key ?? "");
-}
 
 /** AI analysis of one document version: type, facts, cited summary and review. */
 export function AiAnalysis({
@@ -135,15 +127,19 @@ export function AiAnalysis({
   );
 }
 
-function OutputCard({
+/** One AI output with its review controls: remove items, submit, approve or reject. */
+export function OutputCard({
   output,
   title,
   onChange,
+  removable = true,
   children,
 }: {
   output: Output;
   title: string;
   onChange: () => void;
+  /** Whether single items can be removed (drafts are edited per section instead). */
+  removable?: boolean;
   children: (selected: Set<number>, toggle: (i: number) => void) => React.ReactNode;
 }) {
   const canDraft = useCan("draft_ai_outputs");
@@ -151,7 +147,7 @@ function OutputCard({
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const editable = canDraft && output.status !== "aprovado";
+  const editable = removable && canDraft && output.status !== "aprovado";
   const decidable = canApprove && (output.status === "rascunho" || output.status === "em_revisao");
   const path = { params: { path: { output_id: output.id } } };
 

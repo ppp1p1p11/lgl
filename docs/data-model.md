@@ -74,22 +74,27 @@ Also: `tenants.ai_monthly_budget_usd` (default 50) and `tenants.ai_redaction_ena
 (default true); `documents.doc_class_source` (`ai` or `user`; the AI never overwrites a
 type set by a person).
 
-### Drafting — Phase 4
+### Research and drafting — Phases 3 and 4 (implemented)
+
+No new firm tables. A research question or a draft is an `ai_runs` row (`workflow` =
+`legal_research` or `drafting`; `input` jsonb holds the question and date, or the
+template id and instructions; `matter_id` is optional for research) with one
+`ai_outputs` row (`kind` = `research_answer` or `draft`). `ai_citations` rows point
+either at a document page (`document_version_id`) or at a legal provision
+(`legal_unit_version_id`), never both. Draft templates live in code
+(`drafting/templates.py`) until firms need to edit them.
+
+### Deadlines and tasks — Phase 5 (implemented, without DataJud)
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `templates` | tenant_id (nullable = system template), kind (petição inicial, contestação, notificação extrajudicial, contrato), body, variables | Firm can copy and edit system templates |
-| `drafts` | tenant_id, matter_id, template_id, ai_output_id | Content lives in `ai_output_versions`; .docx generated on export |
+| `holidays` | tenant_id (NULL = national, shipped with the system), day, name, kind (feriado, ponto_facultativo, suspensao_expediente), scope, source, created_by | Data, not code. Firms see national rows plus their own |
+| `deadline_proposals` | tenant_id, matter_id, title, rule_set (cpc, clt, jec), preset_id, trigger_kind, trigger_date, days, unit (dias úteis/corridos), doubled_reason, proposed_date, steps (jsonb, the reasoning), status (`proposto`, `confirmado`, `rejeitado`), confirmed_date, decided_by, decided_at, decision_note | Never auto-confirmed |
+| `tasks` | tenant_id, matter_id, title, due_date, assignee_user_id, notes, origin (manual / prazo), deadline_proposal_id, status (aberta, concluida, cancelada) | A confirmed deadline creates one |
+| `datajud_links` *(planned)* | tenant_id, matter_id, cnj_number, tribunal, last_synced_at | Only processos the firm registers; waits for VERIFY SRC-6 |
 
-### Deadlines and tasks — Phase 5
-
-| Table | Key fields | Notes |
-|---|---|---|
-| `holiday_calendars` | tenant_id (nullable = system), court, comarca, year | Data, not code. Firms can add local holidays |
-| `holidays` | calendar_id, date, name, kind (feriado, ponto facultativo, suspensão de expediente), source | |
-| `deadline_proposals` | tenant_id, matter_id, trigger_event_id, rule_set (cpc, clt, juizados), rule_id, days, counting (dias úteis/corridos), doubled_reason, proposed_date, reasoning (jsonb, step by step), status (`proposto`, `confirmado`, `rejeitado`), confirmed_by, confirmed_at | Never auto-confirmed |
-| `tasks` | tenant_id, matter_id, title, due_at, assignee, origin (manual / deadline / ai proposal), status | |
-| `datajud_links` | tenant_id, matter_id, cnj_number, tribunal, last_synced_at | Only processos the firm registers |
+Also: `users.must_change_password` (set when a sócio creates an account with a temporary
+password).
 
 ### Compliance — Phase 6 (modelled early, built later)
 
@@ -98,22 +103,20 @@ type set by a person).
 and a future `usage_events` table give billing what it needs later without
 schema changes to existing tables.
 
-## 3. Legal corpus (global, read-only to tenants) — Phase 3
+## 3. Legal corpus (global, read-only to tenants) — Phase 3 (implemented)
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `corpus_sources` | name (LexML, Planalto, STF, STJ, TST), base_url, terms_checked_at | |
-| `ingestion_runs` | source_id, started_at, finished_at, status, stats, code_version | Re-runnable, idempotent |
-| `legal_documents` | type, issuing_body, identifier (e.g. URN LexML or "Súmula Vinculante 13"), title, publication_date, source_url | One law, one súmula, one decision |
-| `legal_units` | legal_document_id, parent_id, unit_type (livro, título, capítulo, artigo, parágrafo, inciso, alínea, ementa, relatório, voto, dispositivo), label ("art. 219, parágrafo único"), path | Structural tree |
-| `legal_unit_versions` | legal_unit_id, text, valid_from, valid_to, status (`vigente`, `revogado`, `alterado`), amended_by, content_hash, retrieved_at, source_url | Temporal validity (rule 4) |
-| `corpus_chunks` | legal_unit_version_id, text, tsv, embedding | Chunk = one structural unit, never a fixed token window |
+| `corpus_ingestion_runs` | source, started_at, finished_at, status, stats | Re-runnable, idempotent |
+| `legal_documents` | doc_type, issuing_body, identifier (e.g. "Lei 13.105/2015"), short_name, title, publication_date, source_url, review_status (`oficial` / `demonstracao_nao_conferida`) | One law, one súmula, one decision |
+| `legal_units` | legal_document_id, parent_id, unit_type (artigo, paragrafo, inciso, alinea…), label ("art. 219, parágrafo único"), heading_path, position | Structural tree |
+| `legal_unit_versions` | legal_unit_id, text, valid_from, valid_to, status (`vigente`, `revogado`, `alterado`), amendment_note, content_hash, tsv, embedding (not filled yet) | Temporal validity (rule 4). One searchable chunk = one unit version |
 
 **Source hierarchy** (`legal_documents.type`, each with a weight used in
 ranking and shown in the UI): `legislacao` · `sumula_vinculante` ·
 `precedente_qualificado` (repetitivo, repercussão geral, IRDR, IAC) ·
-`sumula` · `decisao` · `doutrina`. The exact weights are a product decision to
-make with a lawyer in Phase 3.
+`sumula` · `decisao` · `doutrina`. The current weights are placeholders
+(VERIFY SRC-11).
 
 ## 4. Core ER diagram
 

@@ -4,12 +4,17 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Deadlines } from "@/components/Deadlines";
 import { DocumentStatus, isPending } from "@/components/DocumentStatus";
+import { Drafts } from "@/components/Drafts";
 import { ErrorText } from "@/components/ErrorText";
+import { ResearchPanel } from "@/components/Research";
+import { MatterTasks, type Task } from "@/components/Tasks";
+import { Timeline } from "@/components/Timeline";
 import { api } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
 import { errorMessage } from "@/lib/errors";
-import { formatBytes, formatDateTime, snippetParts } from "@/lib/format";
+import { formatBytes, snippetParts } from "@/lib/format";
 import { t } from "@/lib/i18n";
 import { useCan } from "@/lib/session";
 import { uploadFile } from "@/lib/upload";
@@ -32,18 +37,20 @@ export default function ProcessoPage() {
   const [notFound, setNotFound] = useState(false);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [uploadErrors, setUploadErrors] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     const path = { params: { path: { matter_id: id } } };
-    const [m, d, e] = await Promise.all([
+    const [m, d, e, k] = await Promise.all([
       api.GET("/api/matters/{matter_id}", path),
       api.GET("/api/matters/{matter_id}/documents", path),
       api.GET("/api/matters/{matter_id}/events", path),
+      api.GET("/api/matters/{matter_id}/tasks", path),
     ]);
-    return { matter: m.data, docs: d.data ?? [], events: e.data ?? [] };
+    return { matter: m.data, docs: d.data ?? [], events: e.data ?? [], tasks: k.data ?? [] };
   }, [id]);
 
   const apply = useCallback((r: Awaited<ReturnType<typeof load>>) => {
@@ -54,6 +61,7 @@ export default function ProcessoPage() {
     setMatter(r.matter);
     setDocs(r.docs);
     setEvents(r.events);
+    setTasks(r.tasks);
   }, []);
 
   const refresh = useCallback(() => load().then(apply), [load, apply]);
@@ -193,6 +201,10 @@ export default function ProcessoPage() {
       </section>
 
       <SearchSection matterId={id} />
+      <Deadlines matterId={id} onChange={refresh} />
+      <MatterTasks matterId={id} tasks={tasks} people={matter.members} onChange={refresh} />
+      <Drafts matterId={id} />
+      <ResearchPanel matterId={id} title={t.pesquisa.title} />
       <PartiesSection matter={matter} canManage={canManage} onChange={setMatter} />
 
       <section className="card">
@@ -207,16 +219,7 @@ export default function ProcessoPage() {
         </ul>
       </section>
 
-      <section className="card">
-        <h2>{t.processo.timeline}</h2>
-        <ol className="timeline">
-          {events.map((e) => (
-            <li key={e.id}>
-              <span className="muted small">{formatDateTime(e.occurred_at)}</span> {e.summary}
-            </li>
-          ))}
-        </ol>
-      </section>
+      <Timeline matterId={id} events={events} onChange={refresh} />
     </>
   );
 }

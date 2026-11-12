@@ -32,12 +32,12 @@ not create empty scaffolding ahead of time.
 │   │   ├── matters/              # clients, processos, parties, team, timeline
 │   │   ├── documents/            # upload, file types, extraction/OCR, chunking, search
 │   │   ├── gateway/              # AI gateway: providers (Claude, demo), redaction, pricing, call log
-│   │   ├── ai/                   # document analysis workflows, verification, review   (2b)
-│   │   ├── agents/               # orchestrators with scoped tools          (Phase 3+)
-│   │   ├── corpus/               # ingestion per source, chunking, search  (Phase 3)
-│   │   ├── drafting/             # templates, generation, .docx export     (Phase 4)
-│   │   ├── deadlines/            # rule sets (cpc, clt, juizados), calendars (Phase 5)
-│   │   └── datajud/              # read-only DataJud connector             (Phase 5)
+│   │   ├── ai/                   # document analysis, legal research, verification, review
+│   │   ├── corpus/               # legal corpus: parser, ingestion, search, demo sample
+│   │   ├── drafting/             # templates, draft generation, section edits, .docx export
+│   │   ├── deadlines/            # deadline engine (cpc, clt, jec), holidays, proposals, tasks
+│   │   ├── maintenance.py        # housekeeping job (abandoned uploads, expired sessions)
+│   │   └── datajud/              # read-only DataJud connector             (not built yet)
 │   ├── scripts/                  # export_openapi, ocr_eval, make_test_corpus
 │   └── tests/
 │       ├── corpus/               # synthetic test-document generator (ADR-0007)
@@ -66,7 +66,7 @@ not create empty scaffolding ahead of time.
     ├── phase-0-plan.md
     ├── VERIFY.md
     ├── adr/                      # architecture decision records
-    ├── compliance/               # LGPD, OAB checklists for lawyer review (Phase 2+)
+    ├── before-pilot.md           # what must happen before a real firm uses the system
     └── security/threat-model.md  # (Phase 1)
 ```
 

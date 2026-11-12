@@ -9,12 +9,25 @@ propose deadlines. A lawyer approves every consequential output.
   [`docs/phase-0-plan.md`](docs/phase-0-plan.md))
 - Conventions for AI-assisted development: [`CLAUDE.md`](CLAUDE.md)
 
-**Status:** Phase 2b is done. You can log in with MFA, register clients and processos,
-upload documents (PDF, Word, photos), read their text (including scanned pages, via OCR)
-next to the original, and search inside a processo. On each document, **"Analisar com
-IA"** suggests the document type, extracts facts with the exact passage they come from,
-and writes a cited summary; a lawyer reviews and approves a specific version. Firm
-isolation is enforced by the database and covered by tests.
+**Status:** everything that does not need an outside service is built and can be tried
+in the browser with fictional data:
+
+- Login with MFA, firms, roles; a sócio adds and removes people (Administração → Equipe).
+- Clients, processos, parties, timeline (movements typed by hand for now).
+- Documents: upload PDF/Word/photos, OCR, side-by-side reading, search.
+- **Análise por IA** of a document: type, facts with the source passage, cited summary.
+- **Prazos**: a calculator that shows its reasoning step by step (CPC, CLT, Juizados),
+  a holiday calendar, and confirmation by a lawyer, which creates a task.
+- **Pesquisa jurídica**: answers only from the indexed legal texts, each sentence linked
+  to the provision it comes from.
+- **Minutas**: drafts built from a template, the processo's documents and the legal
+  texts; edit per section, approve, download as Word.
+- Review and approval of every AI output by a named lawyer; audit log; AI cost report.
+
+**What is still missing** (needs outside services or a lawyer): the real AI key, the
+official legal texts (the bundled sample of CPC articles is an *unverified demonstration*),
+court data (DataJud), e-mail, and deployment in Brazil. See
+[`docs/before-pilot.md`](docs/before-pilot.md).
 
 **AI modes:** without an Anthropic API key, the app uses a *simulated* AI (simple rules,
 clearly labelled "IA simulada") so you can try the whole flow. With `ANTHROPIC_API_KEY`
@@ -62,6 +75,9 @@ needs a lawyer's review of the data-transfer rules first.
    ./run-local.sh
    ```
 
+   To open the app through another address (for example a tunnel or a cloud preview),
+   start it with `LEGALOS_LOCAL_PREVIEW=1 ./run-local.sh`. Development only.
+
    If something is missing, the script says exactly what to install. If it stops with
    an error, the details are in `.local/logs/`.
 
@@ -75,10 +91,12 @@ cp .env.example .env          # local settings (fictional, development-only valu
 docker compose up --build     # first run takes a few minutes
 ```
 
-In a second terminal, add the fictional firms and users:
+In a second terminal, add the fictional firms and users, and the demonstration sample
+of legal texts:
 
 ```bash
 docker compose run --rm api python -m legalos.seed
+docker compose run --rm api python -m legalos.corpus.ingest --demo
 ```
 
 Then open **http://localhost:3000** and log in, for example as

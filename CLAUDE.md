@@ -11,9 +11,18 @@ for scope and rules).
   queue, object storage, CI, seed data.
 - Phase 2 plan approved 2026-10-29 (`docs/phase-2-plan.md`), split into 2a and 2b.
 - Phase 2a (matters + documents, no AI) — done (PR ppp1p1p11/lgl#1).
-- **Phase 2b (AI on documents) — done, awaiting founder review.** AI gateway, document
-  type, facts with verified quotes, cited summary, review/approval, demo AI, `run-local.sh`.
-  Not yet run against the real model (no API key in this environment): VERIFY AI-6.
+- Phase 2b (AI on documents) — done.
+- **Phases 3–6, everything that needs no external service — built, awaiting founder
+  review** (founder asked to leave APIs for last): deadline engine + holidays + tasks,
+  legal corpus (structure, ingestion, search) with an unverified demo sample, legal
+  research, drafting from templates with Word export, team management, password change,
+  audit viewer, AI cost report, maintenance job. ADRs 0008–0010.
+- **Not built yet:** real-model evaluation (VERIFY AI-6, AI-7), official legal texts and
+  the 50-question research evaluation set, embeddings/re-ranking, DataJud, e-mail,
+  retention/legal hold/data-subject requests, backups, deployment in Brazil. See
+  `docs/before-pilot.md`.
+- Nothing about Brazilian law in the code (deadline rules, presets, templates, source
+  weights, demo corpus) has been checked by a lawyer: VERIFY DL-*, DRAFT-1, SRC-11, SRC-12.
 - AI runs on Anthropic's API (no Brazil region): only synthetic/public documents until a
   lawyer approves the international-transfer setup (VERIFY REG-2).
 - Test documents: synthetic, or public sources whose terms were checked. Never collect
@@ -104,6 +113,10 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
   elsewhere). Document text goes in `DocumentInput` blocks, never in instructions. Every
   quote/citation must pass `ai.verify.locate`; unverifiable content is dropped or flagged.
   AI outputs are immutable versions; changes create a new version that needs approval.
+- Legal corpus tables are written only by `python -m legalos.corpus.ingest` (owner role);
+  the app role has SELECT only. Research and drafting may cite only what search returned.
+- Deadlines: `deadlines/engine.py` stays pure (no DB, no clock, no AI); every step it
+  takes must appear in the reasoning shown to the user. Holidays are data.
 - Tests use a scripted provider (`monkeypatch.setattr(gateway, "get_provider", ...)`);
   without `ANTHROPIC_API_KEY` the app uses the rule-based demo provider (never in
   production).
@@ -115,6 +128,9 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
 | Whole stack on a Mac/Linux without Docker | `./run-local.sh` (`./run-local.sh reset` wipes `.local/`) |
 | Whole stack locally with Docker | `cp .env.example .env && docker compose up --build` |
 | Seed fictional firms | `docker compose run --rm api python -m legalos.seed` |
+| Load legal texts | `cd backend && uv run python -m legalos.corpus.ingest --demo` (demo sample) or `… ingest file.txt` (format: see `corpus/parser.py`) |
+| Housekeeping job | `cd backend && uv run python -m legalos.maintenance` |
+| Browser preview behind another address | `LEGALOS_LOCAL_PREVIEW=1 ./run-local.sh` (sets `LEGALOS_PREVIEW_MODE`; refused in production) |
 | Backend tests | `cd backend && uv run pytest` (needs Postgres+pgvector; `LEGALOS_TEST_ADMIN_URL`, default `postgresql://postgres:postgres@localhost:5432/postgres`) |
 | Storage integration test | set `LEGALOS_TEST_S3_ENDPOINT=http://localhost:8333` with SeaweedFS running |
 | OCR accuracy report | `cd backend && uv run python scripts/ocr_eval.py` (needs `tesseract` + `tesseract-ocr-por`) |
@@ -136,5 +152,6 @@ Repo layout: `docs/repo-structure.md`. Data model: `docs/data-model.md`.
 | `docs/architecture.md` | Architecture diagrams (Mermaid) |
 | `docs/data-model.md` | Entities, tenancy, ER diagram, glossary |
 | `docs/repo-structure.md` | Directory layout |
+| `docs/before-pilot.md` | What must happen before a real firm uses the system |
 | `docs/VERIFY.md` | Facts that need external confirmation before we rely on them |
 | `docs/adr/` | Architecture decision records |

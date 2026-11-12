@@ -40,3 +40,6 @@ Briefly, and why not.
 | [0005](0005-ocr-engine.md) | OCR with self-hosted Tesseract | Accepted |
 | [0006](0006-ai-model-and-gateway.md) | AI model and gateway | Accepted |
 | [0007](0007-test-documents.md) | Test documents are synthetic or verified-public only | Accepted |
+| [0008](0008-deadline-engine.md) | Deadline engine as pure, explainable rules | Accepted |
+| [0009](0009-legal-corpus-and-search.md) | Legal corpus structure and search without embeddings (for now) | Accepted |
+| [0010](0010-drafting-from-templates.md) | Drafts are assembled from templates, section by section | Accepted |

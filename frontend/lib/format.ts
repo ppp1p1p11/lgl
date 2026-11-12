@@ -8,6 +8,30 @@ export function formatDateTime(iso: string): string {
   });
 }
 
+/** A calendar date ("2026-03-09") as dd/mm/aaaa, without time-zone shifts. */
+export function formatDate(isoDate: string): string {
+  const [year, month, day] = isoDate.slice(0, 10).split("-");
+  return `${day}/${month}/${year}`;
+}
+
+/** Today in São Paulo, as "aaaa-mm-dd" (the format date inputs and the API use). */
+export function todayIso(): string {
+  return new Date().toLocaleDateString("sv-SE", { timeZone: TZ });
+}
+
+/** Replace {name} placeholders in a message. */
+export function fill(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, k: string) => String(values[k] ?? ""));
+}
+
+/** Translated label for a code, or the code itself when there is no translation. */
+export function label<T extends Record<string, string>>(
+  map: T,
+  key: string | null | undefined,
+): string {
+  return (key != null ? map[key as keyof T] : undefined) ?? key ?? "";
+}
+
 export function formatBytes(bytes: number | null | undefined): string {
   if (bytes == null) return "";
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
