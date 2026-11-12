@@ -4,7 +4,6 @@ Everything produced here is a draft (status "rascunho") until a lawyer approves 
 specific version (see review.py).
 """
 
-import logging
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -14,25 +13,26 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from legalos.ai import prompts
-from legalos.ai.models import AiCitation, AiOutput, AiOutputVersion, AiRun
+from legalos.ai.common import (
+    CitationRecord,
+    caller,
+    is_claim,
+    provider_name,
+    run_job,
+    save_output,
+)
+from legalos.ai.models import AiRun
 from legalos.ai.verify import PageText, locate
 from legalos.documents.models import Document, DocumentChunk, DocumentPage, DocumentVersion
 from legalos.gateway import service as gateway
-from legalos.gateway.types import AIRequest, Citation, DocumentInput, TransientProviderError
+from legalos.gateway.types import AIRequest, Citation, DocumentInput
 from legalos.jobs.models import Job
 from legalos.jobs.queue import enqueue, handler
 from legalos.matters.service import add_event
 
-logger = logging.getLogger(__name__)
-
-# (item index, page, char start, char end, quoted text, verification)
-CitationRow = tuple[int, int | None, int | None, int | None, str, str]
-
 # Longer documents are analysed in part (first pages), and the output says so.
 MAX_DOCUMENT_CHARS = 300_000
 CLASSIFY_CHARS = 8_000
-# Summary passages shorter than this (headings, connectives) need no citation.
-MIN_CLAIM_CHARS = 25
 
 
 class AnalysisError(Exception):
@@ -116,37 +116,7 @@ def _material(db: Session, version: DocumentVersion) -> _Material:
 
 @handler("ai.analyze_document")
 def analyze_document(db: Session, job: Job) -> None:
-    run = db.get(AiRun, uuid.UUID(job.payload["run_id"]))
-    if run is None or run.status not in ("queued", "running"):
-        return
-    try:
-        with db.begin_nested():
-            _analyze(db, run)
-    except TransientProviderError:
-        if job.attempts < job.max_attempts:
-            raise  # the queue retries with backoff
-        _fail(db, run, "ai_unavailable")
-    except gateway.AIError as e:
-        _fail(db, run, e.code)
-    except Exception:
-        if job.attempts < job.max_attempts:
-            raise
-        logger.exception("document analysis failed", extra={"ai_run_id": str(run.id)})
-        _fail(db, run, "ai_error")
-
-
-def _fail(db: Session, run: AiRun, code: str) -> None:
-    db.refresh(run)
-    run.status, run.error_code, run.finished_at = "failed", code, datetime.now(UTC)
-    add_event(
-        db,
-        tenant_id=run.tenant_id,
-        matter_id=run.matter_id,
-        kind="analise_ia_falhou",
-        summary="A análise por IA não pôde ser concluída",
-        actor_user_id=None,
-        payload={"ai_run_id": str(run.id), "error_code": code},
-    )
+    run_job(db, job, _analyze, failure_summary="A análise por IA não pôde ser concluída")
 
 
 def _analyze(db: Session, run: AiRun) -> None:
@@ -156,7 +126,7 @@ def _analyze(db: Session, run: AiRun) -> None:
     material = _material(db, version)
     blocks = [c.text for c in material.chunks]
     document_input = DocumentInput(material.document.title, blocks)
-    call = _caller(db, run)
+    call = caller(db, run)
 
     # 1. Document type (a label, not a consequential output: no approval needed).
     head: list[str] = []
@@ -193,7 +163,7 @@ def _analyze(db: Session, run: AiRun) -> None:
         )
     )
     facts: list[dict[str, Any]] = []
-    fact_citations: list[CitationRow] = []
+    fact_citations: list[CitationRecord] = []
     discarded = 0
     for raw in (extracted.json or {}).get("facts", []):
         found = locate(str(raw.get("quote", "")), material.pages)
@@ -201,13 +171,14 @@ def _analyze(db: Session, run: AiRun) -> None:
             discarded += 1
             continue
         fact_citations.append(
-            (
+            CitationRecord(
                 len(facts),
-                found.page_number,
-                found.char_start,
-                found.char_end,
                 found.text,
                 "verificado",
+                page_number=found.page_number,
+                char_start=found.char_start,
+                char_end=found.char_end,
+                document_version_id=version.id,
             )
         )
         facts.append(
@@ -218,18 +189,18 @@ def _analyze(db: Session, run: AiRun) -> None:
                 "page_number": found.page_number,
             }
         )
-    _save_output(
+    save_output(
         db,
         run,
-        version,
         "facts",
         {
             "facts": facts,
             "discarded": discarded,
             "partial": material.partial,
-            "provider": _provider_name(),
+            "provider": provider_name(),
         },
         fact_citations,
+        document_version_id=version.id,
     )
 
     # 3. Summary with citations to exact passages, each one re-checked.
@@ -244,17 +215,18 @@ def _analyze(db: Session, run: AiRun) -> None:
             citations=True,
         )
     )
-    segments, summary_citations = _segments(summarized.parts, material)
-    _save_output(
+    segments, summary_citations = _segments(summarized.parts, material, version.id)
+    save_output(
         db,
         run,
-        version,
         "summary",
-        {"segments": segments, "partial": material.partial, "provider": _provider_name()},
+        {"segments": segments, "partial": material.partial, "provider": provider_name()},
         summary_citations,
+        document_version_id=version.id,
     )
 
     run.status, run.finished_at = "succeeded", datetime.now(UTC)
+    assert run.matter_id is not None
     add_event(
         db,
         tenant_id=run.tenant_id,
@@ -266,27 +238,13 @@ def _analyze(db: Session, run: AiRun) -> None:
     )
 
 
-def _caller(db: Session, run: AiRun) -> Any:
-    def call(request: AIRequest) -> Any:
-        return gateway.call(
-            db, tenant_id=run.tenant_id, user_id=run.started_by, ai_run_id=run.id, request=request
-        )
-
-    return call
-
-
-def _provider_name() -> str:
-    provider = gateway.get_provider()
-    return provider.name if provider else "none"
-
-
 def _segments(
-    parts: list[Any], material: _Material
-) -> tuple[list[dict[str, Any]], list[CitationRow]]:
+    parts: list[Any], material: _Material, version_id: uuid.UUID | None = None
+) -> tuple[list[dict[str, Any]], list[CitationRecord]]:
     """Turn the cited answer into segments. A segment that makes a claim without a
     verified citation is flagged as not verified."""
     segments: list[dict[str, Any]] = []
-    citations: list[CitationRow] = []
+    citations: list[CitationRecord] = []
     in_gaps = False
     for part in parts:
         text: str = part.text
@@ -297,26 +255,31 @@ def _segments(
             found = _verify_citation(cited, material)
             if found is None:
                 citations.append(
-                    (len(segments), None, None, None, cited.cited_text, "nao_verificado")
+                    CitationRecord(
+                        len(segments),
+                        cited.cited_text,
+                        "nao_verificado",
+                        document_version_id=version_id,
+                    )
                 )
             else:
                 verified_any = True
                 citations.append(
-                    (
+                    CitationRecord(
                         len(segments),
-                        found.page_number,
-                        found.char_start,
-                        found.char_end,
                         found.text,
                         "verificado",
+                        page_number=found.page_number,
+                        char_start=found.char_start,
+                        char_end=found.char_end,
+                        document_version_id=version_id,
                     )
                 )
-        is_claim = sum(c.isalnum() for c in text) >= MIN_CLAIM_CHARS and not in_gaps
         segments.append(
             {
                 "text": text,
                 "kind": "gap" if in_gaps else "text",
-                "unverified": is_claim and not verified_any,
+                "unverified": is_claim(text) and not in_gaps and not verified_any,
             }
         )
     return segments, citations
@@ -329,49 +292,3 @@ def _verify_citation(cited: Citation, material: _Material) -> Any:
         return None
     cited_pages = {c.page_number for c in chunks}
     return locate(cited.cited_text, [p for p in material.pages if p.page_number in cited_pages])
-
-
-def _save_output(
-    db: Session,
-    run: AiRun,
-    version: DocumentVersion,
-    kind: str,
-    content: dict[str, Any],
-    citations: list[CitationRow],
-) -> AiOutput:
-    output = AiOutput(
-        id=uuid.uuid4(),
-        tenant_id=run.tenant_id,
-        matter_id=run.matter_id,
-        document_version_id=version.id,
-        ai_run_id=run.id,
-        kind=kind,
-    )
-    db.add(output)
-    db.flush()
-    output_version = AiOutputVersion(
-        id=uuid.uuid4(),
-        tenant_id=run.tenant_id,
-        ai_output_id=output.id,
-        version_no=1,
-        content=content,
-        created_by_ai=True,
-    )
-    db.add(output_version)
-    db.flush()
-    for item_index, page, start, end, quoted, verification in citations:
-        db.add(
-            AiCitation(
-                tenant_id=run.tenant_id,
-                ai_output_version_id=output_version.id,
-                item_index=item_index,
-                document_version_id=version.id,
-                page_number=page,
-                char_start=start,
-                char_end=end,
-                quoted_text=quoted,
-                verification=verification,
-            )
-        )
-    db.flush()
-    return output

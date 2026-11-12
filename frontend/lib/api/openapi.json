@@ -279,6 +279,18 @@
             "title": "Item Index",
             "type": "integer"
           },
+          "legal_unit_version_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Legal Unit Version Id"
+          },
           "page_number": {
             "anyOf": [
               {
@@ -305,6 +317,7 @@
         },
         "required": [
           "item_index",
+          "legal_unit_version_id",
           "page_number",
           "char_start",
           "char_end",
@@ -456,38 +469,272 @@
         "title": "ClientOut",
         "type": "object"
       },
-      "DecisionIn": {
+      "CorpusDocumentOut": {
         "properties": {
-          "comment": {
+          "doc_type": {
+            "enum": [
+              "legislacao",
+              "sumula_vinculante",
+              "precedente_qualificado",
+              "sumula",
+              "decisao",
+              "doutrina"
+            ],
+            "title": "Doc Type",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "identifier": {
+            "title": "Identifier",
+            "type": "string"
+          },
+          "review_status": {
+            "enum": [
+              "oficial",
+              "demonstracao_nao_conferida"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "source_url": {
             "anyOf": [
               {
-                "maxLength": 2000,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Comment"
+            "title": "Source Url"
           },
-          "decision": {
-            "enum": [
-              "aprovado",
-              "rejeitado"
-            ],
-            "title": "Decision",
+          "title": {
+            "title": "Title",
             "type": "string"
           },
-          "version_no": {
-            "title": "Version No",
+          "units": {
+            "title": "Units",
             "type": "integer"
           }
         },
         "required": [
-          "version_no",
-          "decision"
+          "id",
+          "doc_type",
+          "identifier",
+          "short_name",
+          "title",
+          "review_status",
+          "source_url",
+          "units"
         ],
-        "title": "DecisionIn",
+        "title": "CorpusDocumentOut",
+        "type": "object"
+      },
+      "CorpusHitOut": {
+        "properties": {
+          "amendment_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amendment Note"
+          },
+          "doc_type": {
+            "enum": [
+              "legislacao",
+              "sumula_vinculante",
+              "precedente_qualificado",
+              "sumula",
+              "decisao",
+              "doutrina"
+            ],
+            "title": "Doc Type",
+            "type": "string"
+          },
+          "heading_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heading Path"
+          },
+          "identifier": {
+            "title": "Identifier",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "review_status": {
+            "enum": [
+              "oficial",
+              "demonstracao_nao_conferida"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "short_name": {
+            "title": "Short Name",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "status": {
+            "enum": [
+              "vigente",
+              "revogado",
+              "alterado"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "unit_version_id": {
+            "format": "uuid",
+            "title": "Unit Version Id",
+            "type": "string"
+          },
+          "valid_from": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid From"
+          }
+        },
+        "required": [
+          "unit_version_id",
+          "doc_type",
+          "identifier",
+          "short_name",
+          "review_status",
+          "label",
+          "heading_path",
+          "text",
+          "status",
+          "valid_from",
+          "amendment_note",
+          "source_url"
+        ],
+        "title": "CorpusHitOut",
+        "type": "object"
+      },
+      "DeadlineIn": {
+        "properties": {
+          "days": {
+            "maximum": 3650.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "type": "integer"
+          },
+          "doubled_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "fazenda_publica",
+                  "ministerio_publico",
+                  "defensoria_publica",
+                  "litisconsortes"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doubled Reason"
+          },
+          "preset_id": {
+            "anyOf": [
+              {
+                "maxLength": 50,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset Id"
+          },
+          "rule_set": {
+            "enum": [
+              "cpc",
+              "clt",
+              "jec"
+            ],
+            "title": "Rule Set",
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Title",
+            "type": "string"
+          },
+          "trigger_date": {
+            "format": "date",
+            "title": "Trigger Date",
+            "type": "string"
+          },
+          "trigger_kind": {
+            "enum": [
+              "disponibilizacao_dje",
+              "ciencia"
+            ],
+            "title": "Trigger Kind",
+            "type": "string"
+          },
+          "unit": {
+            "default": "dias_uteis",
+            "enum": [
+              "dias_uteis",
+              "dias_corridos"
+            ],
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "rule_set",
+          "trigger_kind",
+          "trigger_date",
+          "days"
+        ],
+        "title": "DeadlineIn",
         "type": "object"
       },
       "DocumentDetail": {
@@ -614,6 +861,62 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "DoublingReasonOut": {
+        "properties": {
+          "id": {
+            "enum": [
+              "fazenda_publica",
+              "ministerio_publico",
+              "defensoria_publica",
+              "litisconsortes"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "DoublingReasonOut",
+        "type": "object"
+      },
+      "EventIn": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "movimentacao",
+              "intimacao",
+              "publicacao",
+              "anotacao"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "occurred_on": {
+            "format": "date",
+            "title": "Occurred On",
+            "type": "string"
+          },
+          "summary": {
+            "maxLength": 500,
+            "minLength": 2,
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "summary",
+          "occurred_on"
+        ],
+        "title": "EventIn",
+        "type": "object"
+      },
       "EventOut": {
         "properties": {
           "actor_user_id": {
@@ -721,6 +1024,132 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HolidayIn": {
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "kind": {
+            "default": "feriado",
+            "enum": [
+              "feriado",
+              "ponto_facultativo",
+              "suspensao_expediente"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "required": [
+          "day",
+          "name"
+        ],
+        "title": "HolidayIn",
+        "type": "object"
+      },
+      "HolidayOut": {
+        "properties": {
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "kind": {
+            "enum": [
+              "feriado",
+              "ponto_facultativo",
+              "suspensao_expediente"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "system": {
+            "title": "System",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "day",
+          "name",
+          "kind",
+          "scope",
+          "source",
+          "system"
+        ],
+        "title": "HolidayOut",
         "type": "object"
       },
       "LoginNextStep": {
@@ -1406,7 +1835,9 @@
           "kind": {
             "enum": [
               "facts",
-              "summary"
+              "summary",
+              "research_answer",
+              "draft"
             ],
             "title": "Kind",
             "type": "string"
@@ -1643,6 +2074,228 @@
         "title": "Permission",
         "type": "string"
       },
+      "PresetOut": {
+        "properties": {
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "rule_set": {
+            "enum": [
+              "cpc",
+              "clt",
+              "jec"
+            ],
+            "title": "Rule Set",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rule_set",
+          "label",
+          "days",
+          "basis"
+        ],
+        "title": "PresetOut",
+        "type": "object"
+      },
+      "PreviewOut": {
+        "properties": {
+          "proposed_date": {
+            "format": "date",
+            "title": "Proposed Date",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          }
+        },
+        "required": [
+          "proposed_date",
+          "steps"
+        ],
+        "title": "PreviewOut",
+        "type": "object"
+      },
+      "ProposalOut": {
+        "properties": {
+          "confirmed_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed Date"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decided_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By Name"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "doubled_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "fazenda_publica",
+                  "ministerio_publico",
+                  "defensoria_publica",
+                  "litisconsortes"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doubled Reason"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "matter_id": {
+            "format": "uuid",
+            "title": "Matter Id",
+            "type": "string"
+          },
+          "proposed_date": {
+            "format": "date",
+            "title": "Proposed Date",
+            "type": "string"
+          },
+          "rule_set": {
+            "enum": [
+              "cpc",
+              "clt",
+              "jec"
+            ],
+            "title": "Rule Set",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "proposto",
+              "confirmado",
+              "rejeitado"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/StepOut"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "trigger_date": {
+            "format": "date",
+            "title": "Trigger Date",
+            "type": "string"
+          },
+          "trigger_kind": {
+            "enum": [
+              "disponibilizacao_dje",
+              "ciencia"
+            ],
+            "title": "Trigger Kind",
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "dias_uteis",
+              "dias_corridos"
+            ],
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "title",
+          "rule_set",
+          "trigger_kind",
+          "trigger_date",
+          "days",
+          "unit",
+          "doubled_reason",
+          "proposed_date",
+          "steps",
+          "status",
+          "confirmed_date",
+          "decision_note",
+          "decided_by_name",
+          "decided_at",
+          "created_at"
+        ],
+        "title": "ProposalOut",
+        "type": "object"
+      },
       "RemoveItemsIn": {
         "properties": {
           "base_version_no": {
@@ -1678,6 +2331,236 @@
         "title": "RemoveItemsIn",
         "type": "object"
       },
+      "ResearchDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "matter_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matter Id"
+          },
+          "on_date": {
+            "format": "date",
+            "title": "On Date",
+            "type": "string"
+          },
+          "output": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OutputOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "output_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "rascunho",
+                  "em_revisao",
+                  "aprovado",
+                  "rejeitado"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Status"
+          },
+          "provider": {
+            "enum": [
+              "anthropic",
+              "demo",
+              "none"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "question",
+          "on_date",
+          "matter_id",
+          "status",
+          "error_code",
+          "output_status",
+          "created_at",
+          "provider",
+          "output"
+        ],
+        "title": "ResearchDetail",
+        "type": "object"
+      },
+      "ResearchIn": {
+        "properties": {
+          "matter_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matter Id"
+          },
+          "on_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On Date"
+          },
+          "question": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "title": "ResearchIn",
+        "type": "object"
+      },
+      "ResearchSummary": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "matter_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matter Id"
+          },
+          "on_date": {
+            "format": "date",
+            "title": "On Date",
+            "type": "string"
+          },
+          "output_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "rascunho",
+                  "em_revisao",
+                  "aprovado",
+                  "rejeitado"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Status"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "succeeded",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "question",
+          "on_date",
+          "matter_id",
+          "status",
+          "error_code",
+          "output_status",
+          "created_at"
+        ],
+        "title": "ResearchSummary",
+        "type": "object"
+      },
       "Role": {
         "enum": [
           "socio",
@@ -1687,6 +2570,66 @@
         ],
         "title": "Role",
         "type": "string"
+      },
+      "RuleSetOut": {
+        "properties": {
+          "basis": {
+            "title": "Basis",
+            "type": "string"
+          },
+          "id": {
+            "enum": [
+              "cpc",
+              "clt",
+              "jec"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "basis"
+        ],
+        "title": "RuleSetOut",
+        "type": "object"
+      },
+      "RulesOut": {
+        "properties": {
+          "doubling_reasons": {
+            "items": {
+              "$ref": "#/components/schemas/DoublingReasonOut"
+            },
+            "title": "Doubling Reasons",
+            "type": "array"
+          },
+          "presets": {
+            "items": {
+              "$ref": "#/components/schemas/PresetOut"
+            },
+            "title": "Presets",
+            "type": "array"
+          },
+          "rule_sets": {
+            "items": {
+              "$ref": "#/components/schemas/RuleSetOut"
+            },
+            "title": "Rule Sets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rule_sets",
+          "presets",
+          "doubling_reasons"
+        ],
+        "title": "RulesOut",
+        "type": "object"
       },
       "RunOut": {
         "properties": {
@@ -1779,6 +2722,24 @@
         "title": "SearchHitOut",
         "type": "object"
       },
+      "StepOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "detail"
+        ],
+        "title": "StepOut",
+        "type": "object"
+      },
       "SwitchFirmRequest": {
         "properties": {
           "tenant_id": {
@@ -1791,6 +2752,233 @@
           "tenant_id"
         ],
         "title": "SwitchFirmRequest",
+        "type": "object"
+      },
+      "TaskIn": {
+        "properties": {
+          "assignee_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee User Id"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "title": {
+            "maxLength": 300,
+            "minLength": 2,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "TaskIn",
+        "type": "object"
+      },
+      "TaskOut": {
+        "properties": {
+          "assignee_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee Name"
+          },
+          "assignee_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee User Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "matter_id": {
+            "format": "uuid",
+            "title": "Matter Id",
+            "type": "string"
+          },
+          "matter_title": {
+            "title": "Matter Title",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "origin": {
+            "enum": [
+              "manual",
+              "prazo"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "aberta",
+              "concluida",
+              "cancelada"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "matter_id",
+          "matter_title",
+          "title",
+          "due_date",
+          "assignee_user_id",
+          "assignee_name",
+          "status",
+          "origin",
+          "notes",
+          "created_at"
+        ],
+        "title": "TaskOut",
+        "type": "object"
+      },
+      "TaskPatch": {
+        "properties": {
+          "assignee_user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee User Id"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 5000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "aberta",
+                  "concluida",
+                  "cancelada"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "title": "TaskPatch",
         "type": "object"
       },
       "UploadRequest": {
@@ -2072,6 +3260,81 @@
         "title": "VersionRef",
         "type": "object"
       },
+      "legalos__ai__router__DecisionIn": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "decision": {
+            "enum": [
+              "aprovado",
+              "rejeitado"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "version_no": {
+            "title": "Version No",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version_no",
+          "decision"
+        ],
+        "title": "DecisionIn",
+        "type": "object"
+      },
+      "legalos__deadlines__router__DecisionIn": {
+        "properties": {
+          "confirmed_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed Date"
+          },
+          "decision": {
+            "enum": [
+              "confirmado",
+              "rejeitado"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "DecisionIn",
+        "type": "object"
+      },
       "legalos__matters__router__MemberOut": {
         "properties": {
           "name": {
@@ -2155,7 +3418,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DecisionIn"
+                "$ref": "#/components/schemas/legalos__ai__router__DecisionIn"
               }
             }
           },
@@ -2686,6 +3949,214 @@
         ]
       }
     },
+    "/api/corpus/documents": {
+      "get": {
+        "description": "What is indexed. Research can only cite what appears here.",
+        "operationId": "list_documents_api_corpus_documents_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CorpusDocumentOut"
+                  },
+                  "title": "Response List Documents Api Corpus Documents Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Documents",
+        "tags": [
+          "corpus"
+        ]
+      }
+    },
+    "/api/corpus/search": {
+      "get": {
+        "description": "Direct search of the indexed texts (no AI).",
+        "operationId": "search_corpus_api_corpus_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 500,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "on_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "On Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CorpusHitOut"
+                  },
+                  "title": "Response Search Corpus Api Corpus Search Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Corpus",
+        "tags": [
+          "corpus"
+        ]
+      }
+    },
+    "/api/deadline-preview": {
+      "post": {
+        "description": "Calculate without saving, so the user can see the reasoning before proposing.",
+        "operationId": "preview_api_deadline_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeadlineIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
+    "/api/deadline-proposals/{proposal_id}/decision": {
+      "post": {
+        "operationId": "decide_api_deadline_proposals__proposal_id__decision_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/legalos__deadlines__router__DecisionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
+    "/api/deadline-rules": {
+      "get": {
+        "operationId": "rules_api_deadline_rules_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RulesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Rules",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
     "/api/document-versions/{version_id}/analysis": {
       "get": {
         "operationId": "get_analysis_api_document_versions__version_id__analysis_get",
@@ -3111,6 +4582,178 @@
         ]
       }
     },
+    "/api/holidays": {
+      "get": {
+        "operationId": "list_holidays_api_holidays_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "maximum": 2100,
+              "minimum": 2000,
+              "title": "Year",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/HolidayOut"
+                  },
+                  "title": "Response List Holidays Api Holidays Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Holidays",
+        "tags": [
+          "deadlines"
+        ]
+      },
+      "post": {
+        "operationId": "add_holiday_api_holidays_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HolidayIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HolidayOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Holiday",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
+    "/api/holidays/suggestions": {
+      "get": {
+        "description": "Movable dates on which courts usually close, not yet in the firm's calendar.\nThey depend on each court's own calendar, so the firm must confirm before adding.",
+        "operationId": "holiday_suggestions_api_holidays_suggestions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "maximum": 2100,
+              "minimum": 2000,
+              "title": "Year",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/HolidayOut"
+                  },
+                  "title": "Response Holiday Suggestions Api Holidays Suggestions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Holiday Suggestions",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
+    "/api/holidays/{holiday_id}": {
+      "delete": {
+        "operationId": "delete_holiday_api_holidays__holiday_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "holiday_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Holiday Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Holiday",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
     "/api/matters": {
       "get": {
         "operationId": "list_matters_api_matters_get",
@@ -3315,6 +4958,104 @@
         ]
       }
     },
+    "/api/matters/{matter_id}/deadline-proposals": {
+      "get": {
+        "operationId": "list_proposals_api_matters__matter_id__deadline_proposals_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProposalOut"
+                  },
+                  "title": "Response List Proposals Api Matters  Matter Id  Deadline Proposals Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Proposals",
+        "tags": [
+          "deadlines"
+        ]
+      },
+      "post": {
+        "operationId": "create_proposal_api_matters__matter_id__deadline_proposals_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeadlineIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Proposal",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
     "/api/matters/{matter_id}/documents": {
       "get": {
         "operationId": "list_documents_api_matters__matter_id__documents_get",
@@ -3455,6 +5196,58 @@
           }
         },
         "summary": "List Events",
+        "tags": [
+          "matters"
+        ]
+      },
+      "post": {
+        "description": "Record a movement, intimação or publication by hand (until DataJud is connected).",
+        "operationId": "add_manual_event_api_matters__matter_id__events_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Manual Event",
         "tags": [
           "matters"
         ]
@@ -3674,6 +5467,356 @@
         "summary": "Search",
         "tags": [
           "documents"
+        ]
+      }
+    },
+    "/api/matters/{matter_id}/tasks": {
+      "get": {
+        "operationId": "list_matter_tasks_api_matters__matter_id__tasks_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TaskOut"
+                  },
+                  "title": "Response List Matter Tasks Api Matters  Matter Id  Tasks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Matter Tasks",
+        "tags": [
+          "deadlines"
+        ]
+      },
+      "post": {
+        "operationId": "create_task_api_matters__matter_id__tasks_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "matter_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Matter Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Task",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
+    "/api/research": {
+      "get": {
+        "operationId": "list_research_api_research_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "matter_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Matter Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ResearchSummary"
+                  },
+                  "title": "Response List Research Api Research Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Research",
+        "tags": [
+          "ai"
+        ]
+      },
+      "post": {
+        "operationId": "start_research_api_research_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResearchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Research",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/research/{run_id}": {
+      "get": {
+        "operationId": "get_research_api_research__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Research",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "description": "Tasks across all processos of the firm, soonest due date first.",
+        "operationId": "list_tasks_api_tasks_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "default": "aberta",
+              "enum": [
+                "aberta",
+                "concluida",
+                "cancelada"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Mine",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TaskOut"
+                  },
+                  "title": "Response List Tasks Api Tasks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Tasks",
+        "tags": [
+          "deadlines"
+        ]
+      }
+    },
+    "/api/tasks/{task_id}": {
+      "patch": {
+        "operationId": "update_task_api_tasks__task_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Task Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Task",
+        "tags": [
+          "deadlines"
         ]
       }
     }

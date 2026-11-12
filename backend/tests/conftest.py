@@ -66,6 +66,12 @@ def database() -> Iterator[None]:
     cfg = Config(os.path.join(BACKEND_DIR, "alembic.ini"))
     cfg.attributes["database_url"] = OWNER_URL
     command.upgrade(cfg, "head")
+    # Reference data created by migrations (national holidays) is wiped with everything
+    # else between tests, so keep a copy to restore.
+    with psycopg.connect(OWNER_URL.replace("+psycopg", ""), autocommit=True) as conn:
+        conn.execute(
+            "CREATE TABLE _test_system_holidays AS SELECT * FROM holidays WHERE tenant_id IS NULL"
+        )
     yield
     get_engine().dispose()
 
@@ -83,10 +89,12 @@ def clean_tables(owner_engine: Engine) -> None:
         tables = conn.execute(
             text(
                 "SELECT string_agg(quote_ident(tablename), ', ') FROM pg_tables "
-                "WHERE schemaname = 'public' AND tablename <> 'alembic_version'"
+                "WHERE schemaname = 'public' AND tablename <> 'alembic_version' "
+                "AND tablename NOT LIKE '\\_test\\_%'"
             )
         ).scalar_one()
         conn.execute(text(f"TRUNCATE {tables} RESTART IDENTITY CASCADE"))
+        conn.execute(text("INSERT INTO holidays SELECT * FROM _test_system_holidays"))
 
 
 @pytest.fixture

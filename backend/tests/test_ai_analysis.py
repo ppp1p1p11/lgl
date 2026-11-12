@@ -321,7 +321,7 @@ def test_budget_and_provider_failures_end_the_run_with_a_reason(
     run = client.get(f"/api/document-versions/{ticket['version_id']}/analysis").json()["run"]
     assert (run["status"], run["error_code"]) == ("failed", "ai_unavailable")
     events = [e["kind"] for e in client.get(f"/api/matters/{matter['id']}/events").json()]
-    assert events.count("analise_ia_falhou") == 2
+    assert events.count("ia_falhou") == 2
 
 
 def test_demo_provider_end_to_end(client, storage, matter, monkeypatch) -> None:

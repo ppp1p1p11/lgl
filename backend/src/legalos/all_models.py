@@ -6,6 +6,8 @@ Entrypoints that don't import the API routers (the worker, scripts) must import 
 from legalos.ai import models as ai_models
 from legalos.audit import models as audit_models
 from legalos.auth import models as auth_models
+from legalos.corpus import models as corpus_models
+from legalos.deadlines import models as deadlines_models
 from legalos.documents import models as documents_models
 from legalos.gateway import models as gateway_models
 from legalos.jobs import models as jobs_models
@@ -16,6 +18,8 @@ __all__ = [
     "ai_models",
     "audit_models",
     "auth_models",
+    "corpus_models",
+    "deadlines_models",
     "documents_models",
     "gateway_models",
     "jobs_models",

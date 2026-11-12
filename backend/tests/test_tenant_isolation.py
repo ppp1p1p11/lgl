@@ -23,7 +23,16 @@ from legalos.tenancy.roles import Role
 from tests.conftest import app_db, login_with_mfa
 
 # Tables that intentionally have no RLS: they hold no firm data.
-TABLES_WITHOUT_RLS = {"alembic_version", "auth_attempts"}
+TABLES_WITHOUT_RLS = {
+    "alembic_version",
+    "auth_attempts",
+    "_test_system_holidays",
+    # The legal corpus is public law shared by every firm; the app role can only read it.
+    "corpus_ingestion_runs",
+    "legal_documents",
+    "legal_units",
+    "legal_unit_versions",
+}
 
 
 @pytest.fixture
@@ -92,7 +101,8 @@ def test_every_tenant_table_has_rls(owner_db: Session) -> None:
         text(
             "SELECT c.table_name, t.relrowsecurity FROM information_schema.columns c "
             "JOIN pg_class t ON t.relname = c.table_name "
-            "WHERE c.table_schema = 'public' AND c.column_name = 'tenant_id'"
+            "WHERE c.table_schema = 'public' AND c.column_name = 'tenant_id' "
+            "AND c.table_name NOT LIKE '\\_test\\_%'"
         )
     ).all()
     assert rows, "expected tenant-scoped tables"

@@ -29,6 +29,10 @@ class DemoProvider:
     model = "demo"
 
     def complete(self, request: AIRequest) -> AIResponse:
+        if request.purpose == "legal_research":
+            return self._research(request)
+        if request.purpose.startswith("draft_"):
+            return self._draft_section(request)
         blocks = [b for doc in request.documents for b in doc.blocks]
         properties = (request.output_schema or {}).get("properties", {})
         if "doc_class" in properties:
@@ -99,6 +103,55 @@ class DemoProvider:
             )
         )
         return AIResponse(parts=parts, model=self.model, usage=Usage())
+
+    def _research(self, request: AIRequest) -> AIResponse:
+        """Quote the best-ranked sources. No reasoning: this only shows the flow."""
+        parts = [TextPart("Resposta\n")]
+        parts.append(
+            TextPart(
+                "A IA simulada não interpreta a pergunta: abaixo estão os dispositivos do acervo "
+                "mais relacionados aos termos pesquisados.\n"
+            )
+        )
+        parts.append(TextPart("Fundamentos\n"))
+        for index, doc in enumerate(request.documents[:4]):
+            sentence = _first_sentence(doc.blocks[0])
+            parts.append(
+                TextPart(
+                    f"{doc.title.split(' (')[0]}: {sentence}\n", [Citation(index, 0, 1, sentence)]
+                )
+            )
+        parts.append(TextPart("Fatos faltantes\n"))
+        parts.append(
+            TextPart(
+                "A IA simulada não avalia lacunas. Com a IA real, esta seção indica o que as "
+                "fontes não cobrem.\n"
+            )
+        )
+        return AIResponse(parts=parts, model=self.model, usage=Usage())
+
+    def _draft_section(self, request: AIRequest) -> AIResponse:
+        """Draft a section by quoting the attached sources, each with its citation."""
+        parts: list[TextPart] = []
+        for index, doc in enumerate(request.documents[:6]):
+            for block_index, block in enumerate(doc.blocks[:2]):
+                sentence = _first_sentence(block)
+                parts.append(
+                    TextPart(
+                        f"{sentence}\n", [Citation(index, block_index, block_index + 1, sentence)]
+                    )
+                )
+        if not parts:
+            parts.append(TextPart("[Seção a redigir: não há fontes anexadas.]\n"))
+        return AIResponse(parts=parts, model=self.model, usage=Usage())
+
+
+def _first_sentence(text: str, limit: int = 400) -> str:
+    for match in _SENTENCE.finditer(text):
+        sentence = match.group(0).strip()
+        if len(sentence) >= 20:
+            return sentence[:limit]
+    return text.strip()[:limit]
 
 
 def _sentence_around(text: str, start: int, end: int) -> str:

@@ -103,7 +103,7 @@ def evaluate(provider: AnthropicProvider, doc: SyntheticDocument, injected: bool
         facts=len(facts),
         facts_verified=verified_facts,
         citations=len(citations),
-        citations_verified=sum(1 for c in citations if c[5] == "verificado"),
+        citations_verified=sum(1 for c in citations if c.verification == "verificado"),
         unverified_claims=sum(1 for s in segments if s["unverified"]),
         injection_leaked=leaked,
         cost=total_cost,

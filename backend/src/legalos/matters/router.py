@@ -1,5 +1,5 @@
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime, time
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -376,6 +376,40 @@ def set_member(
     except service.MatterError as e:
         _raise(e)
     return _detail(db, matter)
+
+
+class EventIn(BaseModel):
+    kind: Literal["movimentacao", "intimacao", "publicacao", "anotacao"]
+    summary: str = Field(min_length=2, max_length=500)
+    occurred_on: date
+
+
+@router.post("/matters/{matter_id}/events", status_code=201)
+def add_manual_event(
+    matter_id: uuid.UUID, body: EventIn, principal: Manager, db: DbSession
+) -> EventOut:
+    """Record a movement, intimação or publication by hand (until DataJud is connected)."""
+    tenant_id, user_id = _ids(principal)
+    matter = get_matter_or_404(db, matter_id)
+    event = MatterEvent(
+        tenant_id=tenant_id,
+        matter_id=matter.id,
+        kind=body.kind,
+        source="manual",
+        actor_user_id=user_id,
+        summary=body.summary.strip(),
+        occurred_at=datetime.combine(body.occurred_on, time(12, 0), tzinfo=UTC),
+    )
+    db.add(event)
+    db.flush()
+    return EventOut(
+        id=event.id,
+        kind=event.kind,
+        source=event.source,
+        summary=event.summary,
+        actor_user_id=event.actor_user_id,
+        occurred_at=event.occurred_at,
+    )
 
 
 @router.get("/matters/{matter_id}/events")

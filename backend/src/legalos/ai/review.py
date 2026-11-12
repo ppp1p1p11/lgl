@@ -16,7 +16,28 @@ from legalos.ai.models import AiApproval, AiCitation, AiOutput, AiOutputVersion
 from legalos.audit.service import record
 from legalos.matters.service import add_event
 
-ITEM_LISTS = {"facts": "facts", "summary": "segments"}
+ITEM_LISTS = {"facts": "facts", "summary": "segments", "research_answer": "segments"}
+
+
+KIND_LABELS = {
+    "facts": "Fatos extraídos por IA",
+    "summary": "Resumo por IA",
+    "research_answer": "Pesquisa jurídica",
+    "draft": "Minuta",
+}
+
+
+def _event(db: Session, output: AiOutput, *, kind: str, summary: str, **kwargs: Any) -> None:
+    """Timeline entry for outputs linked to a processo (general research has none)."""
+    if output.matter_id is not None:
+        add_event(
+            db,
+            tenant_id=output.tenant_id,
+            matter_id=output.matter_id,
+            kind=kind,
+            summary=summary,
+            **kwargs,
+        )
 
 
 class ReviewError(Exception):
@@ -49,12 +70,11 @@ def submit_for_review(
     if output.status != "rascunho":
         raise ReviewError("invalid_status")
     output.status = "em_revisao"
-    add_event(
+    _event(
         db,
-        tenant_id=output.tenant_id,
-        matter_id=output.matter_id,
+        output,
         kind="ia_enviada_revisao",
-        summary="Análise por IA enviada para revisão",
+        summary=f"{KIND_LABELS[output.kind]}: enviado(a) para revisão",
         actor_user_id=user_id,
         source="manual",
         payload={"ai_output_id": str(output.id), "version_no": version_no},
@@ -85,13 +105,12 @@ def decide(
     db.add(approval)
     output.status = decision
     db.flush()
-    label = "aprovada" if decision == "aprovado" else "rejeitada"
-    add_event(
+    label = "aprovado(a)" if decision == "aprovado" else "rejeitado(a)"
+    _event(
         db,
-        tenant_id=output.tenant_id,
-        matter_id=output.matter_id,
+        output,
         kind=f"ia_{decision}",
-        summary=f"Análise por IA {label} (versão {version_no})",
+        summary=f"{KIND_LABELS[output.kind]}: {label} (versão {version_no})",
         actor_user_id=user_id,
         source="manual",
         payload={"ai_output_id": str(output.id), "version_no": version_no},
@@ -153,6 +172,7 @@ def remove_items(
                     ai_output_version_id=new_version.id,
                     item_index=new_index[citation.item_index],
                     document_version_id=citation.document_version_id,
+                    legal_unit_version_id=citation.legal_unit_version_id,
                     page_number=citation.page_number,
                     char_start=citation.char_start,
                     char_end=citation.char_end,

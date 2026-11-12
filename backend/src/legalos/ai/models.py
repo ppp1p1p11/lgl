@@ -5,6 +5,7 @@ from typing import Any
 from sqlalchemy import (
     Boolean,
     DateTime,
+    ForeignKey,
     ForeignKeyConstraint,
     Integer,
     String,
@@ -32,9 +33,11 @@ class AiRun(TimestampMixin, Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
-    matter_id: Mapped[uuid.UUID] = mapped_column(Uuid)
-    document_version_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    matter_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    document_version_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     workflow: Mapped[str] = mapped_column(String(30))
+    # What was asked: the research question, the draft's template and instructions…
+    input: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
     status: Mapped[str] = mapped_column(String(20), default="queued")
     error_code: Mapped[str | None] = mapped_column(String(50))
     started_by: Mapped[uuid.UUID | None] = mapped_column(Uuid)
@@ -56,8 +59,8 @@ class AiOutput(TimestampMixin, Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
-    matter_id: Mapped[uuid.UUID] = mapped_column(Uuid)
-    document_version_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    matter_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    document_version_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
     ai_run_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     kind: Mapped[str] = mapped_column(String(30))
     status: Mapped[str] = mapped_column(String(20), default="rascunho")
@@ -103,7 +106,11 @@ class AiCitation(Base):
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     ai_output_version_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     item_index: Mapped[int] = mapped_column(Integer)
-    document_version_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    # Exactly one target: a firm document or a legal corpus unit version.
+    document_version_id: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+    legal_unit_version_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("legal_unit_versions.id")
+    )
     page_number: Mapped[int | None] = mapped_column(Integer)
     char_start: Mapped[int | None] = mapped_column(Integer)
     char_end: Mapped[int | None] = mapped_column(Integer)

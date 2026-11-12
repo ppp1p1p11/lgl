@@ -226,6 +226,100 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/corpus/documents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Documents
+     * @description What is indexed. Research can only cite what appears here.
+     */
+    get: operations["list_documents_api_corpus_documents_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/corpus/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Search Corpus
+     * @description Direct search of the indexed texts (no AI).
+     */
+    get: operations["search_corpus_api_corpus_search_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/deadline-preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Preview
+     * @description Calculate without saving, so the user can see the reasoning before proposing.
+     */
+    post: operations["preview_api_deadline_preview_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/deadline-proposals/{proposal_id}/decision": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Decide */
+    post: operations["decide_api_deadline_proposals__proposal_id__decision_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/deadline-rules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Rules */
+    get: operations["rules_api_deadline_rules_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/document-versions/{version_id}/analysis": {
     parameters: {
       query?: never;
@@ -397,6 +491,62 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/holidays": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Holidays */
+    get: operations["list_holidays_api_holidays_get"];
+    put?: never;
+    /** Add Holiday */
+    post: operations["add_holiday_api_holidays_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/holidays/suggestions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Holiday Suggestions
+     * @description Movable dates on which courts usually close, not yet in the firm's calendar.
+     *     They depend on each court's own calendar, so the firm must confirm before adding.
+     */
+    get: operations["holiday_suggestions_api_holidays_suggestions_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/holidays/{holiday_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete Holiday */
+    delete: operations["delete_holiday_api_holidays__holiday_id__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/matters": {
     parameters: {
       query?: never;
@@ -433,6 +583,24 @@ export interface paths {
     patch: operations["update_matter_api_matters__matter_id__patch"];
     trace?: never;
   };
+  "/api/matters/{matter_id}/deadline-proposals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Proposals */
+    get: operations["list_proposals_api_matters__matter_id__deadline_proposals_get"];
+    put?: never;
+    /** Create Proposal */
+    post: operations["create_proposal_api_matters__matter_id__deadline_proposals_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/matters/{matter_id}/documents": {
     parameters: {
       query?: never;
@@ -461,7 +629,11 @@ export interface paths {
     /** List Events */
     get: operations["list_events_api_matters__matter_id__events_get"];
     put?: never;
-    post?: never;
+    /**
+     * Add Manual Event
+     * @description Record a movement, intimação or publication by hand (until DataJud is connected).
+     */
+    post: operations["add_manual_event_api_matters__matter_id__events_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -534,6 +706,96 @@ export interface paths {
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/api/matters/{matter_id}/tasks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Matter Tasks */
+    get: operations["list_matter_tasks_api_matters__matter_id__tasks_get"];
+    put?: never;
+    /** Create Task */
+    post: operations["create_task_api_matters__matter_id__tasks_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/research": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Research */
+    get: operations["list_research_api_research_get"];
+    put?: never;
+    /** Start Research */
+    post: operations["start_research_api_research_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/research/{run_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Research */
+    get: operations["get_research_api_research__run_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/tasks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Tasks
+     * @description Tasks across all processos of the firm, soonest due date first.
+     */
+    get: operations["list_tasks_api_tasks_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/tasks/{task_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Task */
+    patch: operations["update_task_api_tasks__task_id__patch"];
     trace?: never;
   };
 }
@@ -624,6 +886,8 @@ export interface components {
       char_start: number | null;
       /** Item Index */
       item_index: number;
+      /** Legal Unit Version Id */
+      legal_unit_version_id: string | null;
       /** Page Number */
       page_number: number | null;
       /** Quoted Text */
@@ -678,17 +942,117 @@ export interface components {
       /** Phone */
       phone: string | null;
     };
-    /** DecisionIn */
-    DecisionIn: {
-      /** Comment */
-      comment?: string | null;
+    /** CorpusDocumentOut */
+    CorpusDocumentOut: {
       /**
-       * Decision
+       * Doc Type
        * @enum {string}
        */
-      decision: "aprovado" | "rejeitado";
-      /** Version No */
-      version_no: number;
+      doc_type:
+        | "legislacao"
+        | "sumula_vinculante"
+        | "precedente_qualificado"
+        | "sumula"
+        | "decisao"
+        | "doutrina";
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Identifier */
+      identifier: string;
+      /**
+       * Review Status
+       * @enum {string}
+       */
+      review_status: "oficial" | "demonstracao_nao_conferida";
+      /** Short Name */
+      short_name: string;
+      /** Source Url */
+      source_url: string | null;
+      /** Title */
+      title: string;
+      /** Units */
+      units: number;
+    };
+    /** CorpusHitOut */
+    CorpusHitOut: {
+      /** Amendment Note */
+      amendment_note: string | null;
+      /**
+       * Doc Type
+       * @enum {string}
+       */
+      doc_type:
+        | "legislacao"
+        | "sumula_vinculante"
+        | "precedente_qualificado"
+        | "sumula"
+        | "decisao"
+        | "doutrina";
+      /** Heading Path */
+      heading_path: string | null;
+      /** Identifier */
+      identifier: string;
+      /** Label */
+      label: string;
+      /**
+       * Review Status
+       * @enum {string}
+       */
+      review_status: "oficial" | "demonstracao_nao_conferida";
+      /** Short Name */
+      short_name: string;
+      /** Source Url */
+      source_url: string | null;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "vigente" | "revogado" | "alterado";
+      /** Text */
+      text: string;
+      /**
+       * Unit Version Id
+       * Format: uuid
+       */
+      unit_version_id: string;
+      /** Valid From */
+      valid_from: string | null;
+    };
+    /** DeadlineIn */
+    DeadlineIn: {
+      /** Days */
+      days: number;
+      /** Doubled Reason */
+      doubled_reason?:
+        ("fazenda_publica" | "ministerio_publico" | "defensoria_publica" | "litisconsortes") | null;
+      /** Preset Id */
+      preset_id?: string | null;
+      /**
+       * Rule Set
+       * @enum {string}
+       */
+      rule_set: "cpc" | "clt" | "jec";
+      /** Title */
+      title: string;
+      /**
+       * Trigger Date
+       * Format: date
+       */
+      trigger_date: string;
+      /**
+       * Trigger Kind
+       * @enum {string}
+       */
+      trigger_kind: "disponibilizacao_dje" | "ciencia";
+      /**
+       * Unit
+       * @default dias_uteis
+       * @enum {string}
+       */
+      unit: "dias_uteis" | "dias_corridos";
     };
     /** DocumentDetail */
     DocumentDetail: {
@@ -740,6 +1104,31 @@ export interface components {
       /** Title */
       title: string;
     };
+    /** DoublingReasonOut */
+    DoublingReasonOut: {
+      /**
+       * Id
+       * @enum {string}
+       */
+      id: "fazenda_publica" | "ministerio_publico" | "defensoria_publica" | "litisconsortes";
+      /** Label */
+      label: string;
+    };
+    /** EventIn */
+    EventIn: {
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: "movimentacao" | "intimacao" | "publicacao" | "anotacao";
+      /**
+       * Occurred On
+       * Format: date
+       */
+      occurred_on: string;
+      /** Summary */
+      summary: string;
+    };
     /** EventOut */
     EventOut: {
       /** Actor User Id */
@@ -783,6 +1172,49 @@ export interface components {
     HTTPValidationError: {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
+    };
+    /** HolidayIn */
+    HolidayIn: {
+      /**
+       * Day
+       * Format: date
+       */
+      day: string;
+      /**
+       * Kind
+       * @default feriado
+       * @enum {string}
+       */
+      kind: "feriado" | "ponto_facultativo" | "suspensao_expediente";
+      /** Name */
+      name: string;
+      /** Scope */
+      scope?: string | null;
+      /** Source */
+      source?: string | null;
+    };
+    /** HolidayOut */
+    HolidayOut: {
+      /**
+       * Day
+       * Format: date
+       */
+      day: string;
+      /** Id */
+      id: string | null;
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: "feriado" | "ponto_facultativo" | "suspensao_expediente";
+      /** Name */
+      name: string;
+      /** Scope */
+      scope: string | null;
+      /** Source */
+      source: string | null;
+      /** System */
+      system: boolean;
     };
     /**
      * LoginNextStep
@@ -1038,7 +1470,7 @@ export interface components {
        * Kind
        * @enum {string}
        */
-      kind: "facts" | "summary";
+      kind: "facts" | "summary" | "research_answer" | "draft";
       /** Note */
       note: string | null;
       /**
@@ -1138,6 +1570,97 @@ export interface components {
       | "draft_ai_outputs"
       | "approve_ai_outputs"
       | "confirm_deadlines";
+    /** PresetOut */
+    PresetOut: {
+      /** Basis */
+      basis: string;
+      /** Days */
+      days: number;
+      /** Id */
+      id: string;
+      /** Label */
+      label: string;
+      /**
+       * Rule Set
+       * @enum {string}
+       */
+      rule_set: "cpc" | "clt" | "jec";
+    };
+    /** PreviewOut */
+    PreviewOut: {
+      /**
+       * Proposed Date
+       * Format: date
+       */
+      proposed_date: string;
+      /** Steps */
+      steps: components["schemas"]["StepOut"][];
+    };
+    /** ProposalOut */
+    ProposalOut: {
+      /** Confirmed Date */
+      confirmed_date: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Days */
+      days: number;
+      /** Decided At */
+      decided_at: string | null;
+      /** Decided By Name */
+      decided_by_name: string | null;
+      /** Decision Note */
+      decision_note: string | null;
+      /** Doubled Reason */
+      doubled_reason:
+        ("fazenda_publica" | "ministerio_publico" | "defensoria_publica" | "litisconsortes") | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Matter Id
+       * Format: uuid
+       */
+      matter_id: string;
+      /**
+       * Proposed Date
+       * Format: date
+       */
+      proposed_date: string;
+      /**
+       * Rule Set
+       * @enum {string}
+       */
+      rule_set: "cpc" | "clt" | "jec";
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "proposto" | "confirmado" | "rejeitado";
+      /** Steps */
+      steps: components["schemas"]["StepOut"][];
+      /** Title */
+      title: string;
+      /**
+       * Trigger Date
+       * Format: date
+       */
+      trigger_date: string;
+      /**
+       * Trigger Kind
+       * @enum {string}
+       */
+      trigger_kind: "disponibilizacao_dje" | "ciencia";
+      /**
+       * Unit
+       * @enum {string}
+       */
+      unit: "dias_uteis" | "dias_corridos";
+    };
     /** RemoveItemsIn */
     RemoveItemsIn: {
       /** Base Version No */
@@ -1147,11 +1670,109 @@ export interface components {
       /** Remove */
       remove: number[];
     };
+    /** ResearchDetail */
+    ResearchDetail: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Error Code */
+      error_code: string | null;
+      /** Matter Id */
+      matter_id: string | null;
+      /**
+       * On Date
+       * Format: date
+       */
+      on_date: string;
+      output: components["schemas"]["OutputOut"] | null;
+      /** Output Status */
+      output_status: ("rascunho" | "em_revisao" | "aprovado" | "rejeitado") | null;
+      /**
+       * Provider
+       * @enum {string}
+       */
+      provider: "anthropic" | "demo" | "none";
+      /** Question */
+      question: string;
+      /**
+       * Run Id
+       * Format: uuid
+       */
+      run_id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "queued" | "running" | "succeeded" | "failed";
+    };
+    /** ResearchIn */
+    ResearchIn: {
+      /** Matter Id */
+      matter_id?: string | null;
+      /** On Date */
+      on_date?: string | null;
+      /** Question */
+      question: string;
+    };
+    /** ResearchSummary */
+    ResearchSummary: {
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Error Code */
+      error_code: string | null;
+      /** Matter Id */
+      matter_id: string | null;
+      /**
+       * On Date
+       * Format: date
+       */
+      on_date: string;
+      /** Output Status */
+      output_status: ("rascunho" | "em_revisao" | "aprovado" | "rejeitado") | null;
+      /** Question */
+      question: string;
+      /**
+       * Run Id
+       * Format: uuid
+       */
+      run_id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "queued" | "running" | "succeeded" | "failed";
+    };
     /**
      * Role
      * @enum {string}
      */
     Role: "socio" | "advogado" | "estagiario" | "administrativo";
+    /** RuleSetOut */
+    RuleSetOut: {
+      /** Basis */
+      basis: string;
+      /**
+       * Id
+       * @enum {string}
+       */
+      id: "cpc" | "clt" | "jec";
+      /** Label */
+      label: string;
+    };
+    /** RulesOut */
+    RulesOut: {
+      /** Doubling Reasons */
+      doubling_reasons: components["schemas"]["DoublingReasonOut"][];
+      /** Presets */
+      presets: components["schemas"]["PresetOut"][];
+      /** Rule Sets */
+      rule_sets: components["schemas"]["RuleSetOut"][];
+    };
     /** RunOut */
     RunOut: {
       /**
@@ -1193,6 +1814,13 @@ export interface components {
        */
       version_id: string;
     };
+    /** StepOut */
+    StepOut: {
+      /** Detail */
+      detail: string;
+      /** Label */
+      label: string;
+    };
     /** SwitchFirmRequest */
     SwitchFirmRequest: {
       /**
@@ -1200,6 +1828,70 @@ export interface components {
        * Format: uuid
        */
       tenant_id: string;
+    };
+    /** TaskIn */
+    TaskIn: {
+      /** Assignee User Id */
+      assignee_user_id?: string | null;
+      /** Due Date */
+      due_date?: string | null;
+      /** Notes */
+      notes?: string | null;
+      /** Title */
+      title: string;
+    };
+    /** TaskOut */
+    TaskOut: {
+      /** Assignee Name */
+      assignee_name: string | null;
+      /** Assignee User Id */
+      assignee_user_id: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Due Date */
+      due_date: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Matter Id
+       * Format: uuid
+       */
+      matter_id: string;
+      /** Matter Title */
+      matter_title: string;
+      /** Notes */
+      notes: string | null;
+      /**
+       * Origin
+       * @enum {string}
+       */
+      origin: "manual" | "prazo";
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "aberta" | "concluida" | "cancelada";
+      /** Title */
+      title: string;
+    };
+    /** TaskPatch */
+    TaskPatch: {
+      /** Assignee User Id */
+      assignee_user_id?: string | null;
+      /** Due Date */
+      due_date?: string | null;
+      /** Notes */
+      notes?: string | null;
+      /** Status */
+      status?: ("aberta" | "concluida" | "cancelada") | null;
+      /** Title */
+      title?: string | null;
     };
     /** UploadRequest */
     UploadRequest: {
@@ -1297,6 +1989,30 @@ export interface components {
       /** Version No */
       version_no: number;
     };
+    /** DecisionIn */
+    legalos__ai__router__DecisionIn: {
+      /** Comment */
+      comment?: string | null;
+      /**
+       * Decision
+       * @enum {string}
+       */
+      decision: "aprovado" | "rejeitado";
+      /** Version No */
+      version_no: number;
+    };
+    /** DecisionIn */
+    legalos__deadlines__router__DecisionIn: {
+      /** Confirmed Date */
+      confirmed_date?: string | null;
+      /**
+       * Decision
+       * @enum {string}
+       */
+      decision: "confirmado" | "rejeitado";
+      /** Note */
+      note?: string | null;
+    };
     /** MemberOut */
     legalos__matters__router__MemberOut: {
       /** Name */
@@ -1345,7 +2061,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["DecisionIn"];
+        "application/json": components["schemas"]["legalos__ai__router__DecisionIn"];
       };
     };
     responses: {
@@ -1751,6 +2467,146 @@ export interface operations {
       };
     };
   };
+  list_documents_api_corpus_documents_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CorpusDocumentOut"][];
+        };
+      };
+    };
+  };
+  search_corpus_api_corpus_search_get: {
+    parameters: {
+      query: {
+        q: string;
+        on_date?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CorpusHitOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  preview_api_deadline_preview_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeadlineIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PreviewOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  decide_api_deadline_proposals__proposal_id__decision_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        proposal_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["legalos__deadlines__router__DecisionIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProposalOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  rules_api_deadline_rules_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RulesOut"];
+        };
+      };
+    };
+  };
   get_analysis_api_document_versions__version_id__analysis_get: {
     parameters: {
       query?: never;
@@ -2067,6 +2923,130 @@ export interface operations {
       };
     };
   };
+  list_holidays_api_holidays_get: {
+    parameters: {
+      query: {
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HolidayOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  add_holiday_api_holidays_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["HolidayIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HolidayOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  holiday_suggestions_api_holidays_suggestions_get: {
+    parameters: {
+      query: {
+        year: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HolidayOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_holiday_api_holidays__holiday_id__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        holiday_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   list_matters_api_matters_get: {
     parameters: {
       query?: {
@@ -2198,6 +3178,72 @@ export interface operations {
       };
     };
   };
+  list_proposals_api_matters__matter_id__deadline_proposals_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProposalOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_proposal_api_matters__matter_id__deadline_proposals_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeadlineIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProposalOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   list_documents_api_matters__matter_id__documents_get: {
     parameters: {
       query?: never;
@@ -2282,6 +3328,41 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["EventOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  add_manual_event_api_matters__matter_id__events_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EventIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventOut"];
         };
       };
       /** @description Validation Error */
@@ -2417,6 +3498,234 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SearchHitOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_matter_tasks_api_matters__matter_id__tasks_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TaskOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_task_api_matters__matter_id__tasks_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        matter_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TaskOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_research_api_research_get: {
+    parameters: {
+      query?: {
+        matter_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ResearchSummary"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  start_research_api_research_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResearchIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ResearchSummary"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_research_api_research__run_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        run_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ResearchDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_tasks_api_tasks_get: {
+    parameters: {
+      query?: {
+        status?: "aberta" | "concluida" | "cancelada";
+        mine?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TaskOut"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_task_api_tasks__task_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        task_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TaskPatch"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TaskOut"];
         };
       };
       /** @description Validation Error */

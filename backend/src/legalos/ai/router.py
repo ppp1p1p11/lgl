@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Annotated, Any, Literal
 
@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
-from legalos.ai import review, workflows
+from legalos.ai import research, review, workflows
 from legalos.ai.models import AiApproval, AiCitation, AiOutput, AiOutputVersion, AiRun
 from legalos.audit.service import record
 from legalos.auth.deps import DbSession, client_ip, require
@@ -16,6 +16,7 @@ from legalos.auth.service import Principal
 from legalos.documents.models import Document, DocumentVersion
 from legalos.gateway import service as gateway
 from legalos.gateway.models import GatewayCall
+from legalos.matters.models import Matter
 from legalos.tenancy.models import Tenant
 from legalos.tenancy.roles import Permission
 
@@ -39,6 +40,8 @@ class RunOut(BaseModel):
 
 class CitationOut(BaseModel):
     item_index: int
+    # Set when the citation points to the legal corpus (instead of a firm document).
+    legal_unit_version_id: uuid.UUID | None
     page_number: int | None
     char_start: int | None
     char_end: int | None
@@ -57,7 +60,7 @@ class ApprovalOut(BaseModel):
 
 class OutputOut(BaseModel):
     id: uuid.UUID
-    kind: Literal["facts", "summary"]
+    kind: Literal["facts", "summary", "research_answer", "draft"]
     status: OutputStatus
     version_no: int
     created_by_ai: bool
@@ -152,6 +155,7 @@ def _output_out(db: DbSession, output: AiOutput) -> OutputOut:
         citations=[
             CitationOut(
                 item_index=c.item_index,
+                legal_unit_version_id=c.legal_unit_version_id,
                 page_number=c.page_number,
                 char_start=c.char_start,
                 char_end=c.char_end,
@@ -317,3 +321,91 @@ def update_ai_settings(
         details=body.model_dump(mode="json", exclude_none=True),
     )
     return ai_usage(principal, db)
+
+
+# --- Legal research -----------------------------------------------------------------------
+
+
+class ResearchIn(BaseModel):
+    question: str = Field(min_length=5, max_length=2000)
+    matter_id: uuid.UUID | None = None
+    # Research the law as it stood on this date (default: today).
+    on_date: date | None = None
+
+
+class ResearchSummary(BaseModel):
+    run_id: uuid.UUID
+    question: str
+    on_date: date
+    matter_id: uuid.UUID | None
+    status: Literal["queued", "running", "succeeded", "failed"]
+    error_code: str | None
+    output_status: OutputStatus | None
+    created_at: datetime
+
+
+class ResearchDetail(ResearchSummary):
+    provider: Literal["anthropic", "demo", "none"]
+    output: OutputOut | None
+
+
+def _research_summary(db: DbSession, run: AiRun) -> ResearchSummary:
+    output_status = db.scalar(select(AiOutput.status).where(AiOutput.ai_run_id == run.id))
+    return ResearchSummary(
+        run_id=run.id,
+        question=run.input.get("question", ""),
+        on_date=date.fromisoformat(run.input["on_date"]),
+        matter_id=run.matter_id,
+        status=run.status,
+        error_code=run.error_code,
+        output_status=output_status,
+        created_at=run.created_at,
+    )
+
+
+@router.post("/research", status_code=202)
+def start_research(body: ResearchIn, principal: Drafter, db: DbSession) -> ResearchSummary:
+    tenant_id, user_id = _ids(principal)
+    if body.matter_id is not None and db.get(Matter, body.matter_id) is None:
+        raise HTTPException(404, "matter_not_found")
+    try:
+        run = research.start_research(
+            db,
+            tenant_id=tenant_id,
+            user_id=user_id,
+            question=body.question,
+            matter_id=body.matter_id,
+            on_date=body.on_date,
+        )
+    except research.ResearchError as e:
+        raise HTTPException(e.status_code, e.code) from e
+    return _research_summary(db, run)
+
+
+@router.get("/research")
+def list_research(
+    _: Viewer, db: DbSession, matter_id: uuid.UUID | None = None
+) -> list[ResearchSummary]:
+    stmt = (
+        select(AiRun)
+        .where(AiRun.workflow == "legal_research")
+        .order_by(AiRun.created_at.desc())
+        .limit(100)
+    )
+    if matter_id is not None:
+        stmt = stmt.where(AiRun.matter_id == matter_id)
+    return [_research_summary(db, run) for run in db.scalars(stmt)]
+
+
+@router.get("/research/{run_id}")
+def get_research(run_id: uuid.UUID, _: Viewer, db: DbSession) -> ResearchDetail:
+    run = db.get(AiRun, run_id)
+    if run is None or run.workflow != "legal_research":
+        raise HTTPException(404, "research_not_found")
+    output = db.scalar(select(AiOutput).where(AiOutput.ai_run_id == run.id))
+    provider = gateway.get_provider()
+    return ResearchDetail(
+        **_research_summary(db, run).model_dump(),
+        provider=provider.name if provider else "none",
+        output=_output_out(db, output) if output else None,
+    )
